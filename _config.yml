@@ -21,7 +21,7 @@ title: Cloud Applications - Exercises
   # Google search results) and in your feed.xml site description.
 # baseurl: "https://johancz.github.io/Molnapplikationer-Blogg" # the subpath of your site, e.g. /blog
 baseurl: "/Molnapplikationer-Blogg" # the subpath of your site, e.g. /blog
-url: "https://johancz.github.io" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://johancz.github.io/Molnapplikationer-Blogg" # the base hostname & protocol for your site, e.g. http://example.com
 # twitter_username: jekyllrb
 github_username: johancz
 
