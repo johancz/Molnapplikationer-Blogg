@@ -8,12 +8,13 @@ categories: cloud hosting
 
 ## What is the cloud
 
-In colloquial terms, the cloud is synonymous with Google Drive, Dropbox or Microsoft's Onedrive, and while these are indeed cloud products (Saas services?) the world of cloud hosting and development is a bit different. The cloud simply put is a collection of computers, or servers which are provided in various forms (e.g. Iaas, Paas or Saas). A company can rent these servers to run on their own premises (private cloud) or pay for services where the server is located and maintained in a datacenter (public cloud), or a combination of these two solutions (hybrid cloud). Companies can scale their apps according to their needs 
+In colloquial terms, the cloud is synonymous with Google Drive, Dropbox or Microsoft's Onedrive, and while these are indeed cloud products (Saas services?) the world of cloud hosting and development is a bit different. The cloud simply put is a collection of computers, or servers which are provided in various forms (e.g. Iaas, Paas or Saas). A company can rent these servers to run on their own premises (private cloud) or pay for services where the server is located and maintained in a datacenter (public cloud), or a combination of these two solutions (hybrid cloud). Companies can scale their apps according to their needs by paying for more instances, more CPUs or storage.
 
 ### Types
 - Public
 - Private
 - Hybrid
+
 ### Service models
 #### Iaas (Infrastructure as a service):
 The cloud provider manages the hardware and the customers is requires to configure and maintain the operating system and network configuration themselves. The customer can select the hardware they require but rent it from the provider who is also responsible for maintaining and supporting the hardware.
