@@ -72,9 +72,10 @@ The "Big Three" do appear to have the most configurable services, and since thes
 
 
 ## Sources
-[Azure high availability][source-1]
-[Advantages and Disadvantages of Cloud Computing][source-2]
-[What is the Cloud? Soft and Fluffy Edition - Computer Stuff They Didn't Teach You #10][source-3]
+- [Azure high availability][source-1]
+- [Advantages and Disadvantages of Cloud Computing][source-2]
+- [What is the Cloud? Soft and Fluffy Edition - Computer Stuff They Didn't Teach You #10][source-3]
+
 
 
 [exercise]: https://pgbsnh20.github.io/PGBSNH20-molnapplikationer/cloud-lectures/introduction#pris-uppgift
