@@ -4,7 +4,7 @@ title:  "Exercise 1 The Cloud"
 date:   2021-09-07 21:50:00 +0200
 categories: cloud hosting
 ---
-# Blog Post #1 - The Internet & the Cloud
+# Blog Post #1 - The Internet and the Cloud
 
 ## What is the cloud
 
