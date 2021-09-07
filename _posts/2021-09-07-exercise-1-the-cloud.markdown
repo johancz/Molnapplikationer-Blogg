@@ -66,9 +66,9 @@ The "Big Three" do appear to have the most configurable services, and since thes
 ##### Azure:
 ![Azure Virtual Server price estimate](/Molnapplikationer-Blogg/assets/images/azure-virtual-server-price-estimate.png)
 ##### AWS:
-![Azure Virtual Server price estimate](/Molnapplikationer-Blogg/assets/images/aws-virtual-server-price-estimate.png)
+![AWS Virtual Server price estimate](/Molnapplikationer-Blogg/assets/images/aws-virtual-server-price-estimate.png)
 ##### Google Cloud:
-![Azure Virtual Server price estimate](/Molnapplikationer-Blogg/assets/images/google-cloud-virtual-server-price-estimate.png)
+![Google Cloud Server price estimate](/Molnapplikationer-Blogg/assets/images/google-cloud-virtual-server-price-estimate.png)
 
 
 ## Sources
