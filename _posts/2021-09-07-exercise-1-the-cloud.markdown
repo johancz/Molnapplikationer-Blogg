@@ -58,17 +58,17 @@ _The exercise in full can be found [here][exercise]._
 
 ### Our conclusion:
 We looked at three Swedish cloud providers in addition to the "big three"; AWS, Azure and Google Cloud. This image below shows all of them.
-![Azure Virtual Server price estimate](/assets/images/cloud-providers-price-comparison-spreadsheet.png)
+![Azure Virtual Server price estimate]({{site.baseurl}}/assets/images/cloud-providers-price-comparison-spreadsheet.png)
 We came to the conclusion that the "big three" were cheapest options with one exception, Bahnhof. Whether or not this is true when all cloud providers are taken into account is uncertain since the sample size is far too small to make any final conclusions.
 The "Big Three" do appear to have the most configurable services, and since these providers offer so many additional services under their cloud service umbrella you could conclude that either of the "big three" is a safe bet for any startup.
 
 #### Below are the price estimates for the "big three" cloud providers:
 ##### Azure:
-![Azure Virtual Server price estimate](/assets/images/azure-virtual-server-price-estimate.png)
+![Azure Virtual Server price estimate]({{site.baseurl}}/assets/images/azure-virtual-server-price-estimate.png)
 ##### AWS:
-![Azure Virtual Server price estimate](/assets/images/aws-virtual-server-price-estimate.png)
+![Azure Virtual Server price estimate]({{site.baseurl}}/assets/images/aws-virtual-server-price-estimate.png)
 ##### Google Cloud:
-![Azure Virtual Server price estimate](/assets/images/google-cloud-virtual-server-price-estimate.png)
+![Azure Virtual Server price estimate]({{site.baseurl}}/assets/images/google-cloud-virtual-server-price-estimate.png)
 
 
 ## Sources
