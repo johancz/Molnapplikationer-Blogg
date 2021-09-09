@@ -1,5 +1,4 @@
 ---
-published: false
 layout: post
 title:  "Exercise 1 The Cloud"
 date:   2021-09-07 21:50:00 +0200
