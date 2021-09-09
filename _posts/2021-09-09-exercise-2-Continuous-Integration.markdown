@@ -2,7 +2,7 @@
 layout: post
 title:  "Exercise 2 Continuous Integration"
 date:   2021-09-09 20:50:00 +0200
-# published: false
+published: false
 # hidden: true
 # categories: blog
 tags: Continuous-Integration, GitHub-Actions, CI, CI-Pipelines
