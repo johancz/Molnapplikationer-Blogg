@@ -101,6 +101,7 @@ jobs:
 - [The fork][Spacepark-Spaceinvaders-Fork]
 - [Events that trigger workflows - GitHub's documentation][GitHub-Docs-Actions-workflow-events]
 - [My Yaml file][GitHub-Actions-Yaml-file]
+- [Understanding GitHub Actions - GitHub's documentation][GitHub-Docs-Actions-understanding-github-actions]
 
 
 
@@ -114,3 +115,4 @@ jobs:
 [semaphoreci-dotcom-continuous-integration]: https://semaphoreci.com/continuous-integration
 [redhat-dotcom-what-is-cicd-pipeline]: https://www.redhat.com/en/topics/devops/what-cicd-pipeline
 [semaphoreci-dotcom-Why-We-Need-Continuous-Integration]: https://semaphoreci.com/community/tutorials/continuous-integration
+[GitHub-Docs-Actions-understanding-github-actions]: https://docs.github.com/en/actions/learn-github-actions/understanding-github-actions
