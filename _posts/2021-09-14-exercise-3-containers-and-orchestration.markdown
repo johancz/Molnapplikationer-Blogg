@@ -183,7 +183,7 @@ For GitHub's container registry (GHCR) I elected to use the token provided by gi
 ![Workflow file - login action for Github's registry](/Molnapplikationer-Blogg/data/images/exercise-3-containers-and-orchestration/github-repo-actions-workflow-login-action-github.png)
 
 ### Docker Hub
-The [recommended (by Docker)][[github-com-docker-login-action-repo-authentication-docker-hub]] way of authenticating against Docker Hub is to create a [personal access token][docs-docker-com-managing-access-tokens] which I stored in my repository as secrets in my repository (see the image below).
+The [recommended (by Docker)][github-com-docker-login-action-repo-authentication-docker-hub] way of authenticating against Docker Hub is to create a [personal access token][docs-docker-com-managing-access-tokens] which I stored in my repository as secrets in my repository (see the image below).
 
 ![Github Repository Secrets - Docker Hub authentication info](/Molnapplikationer-Blogg/data/images/exercise-3-containers-and-orchestration/github-repo-secrets-for-docker-hub.png)
 
