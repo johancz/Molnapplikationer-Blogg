@@ -24,7 +24,7 @@ tags: Dockerfile, docker, containers, container-orchestration, docker-compose,
 - The Workflow template [".NET" (by Github Actions)][github-com-actions-starter-workflows-dotnet]
 
 
-## How did you get the app to run in a (Docker) container?
+## How did I get the app to run in a (Docker) container?
 1. I began by forking [Stephan's Repository][github-com-apprepo-original]
 1. I then cloned [my forked repository][github-com-apprepo-myfork] to my computer with Github Desktop.
 1. Next I wanted to test the app:
@@ -45,7 +45,7 @@ tags: Dockerfile, docker, containers, container-orchestration, docker-compose,
 Et voila, the app runs in a container.
 
 
-## Describe your "Dockerfile":
+## My "Dockerfile":
 
 If you'd rather read this in my github repo, [click here][github-com-apprepo-myfork-Dockerfile].
 
@@ -74,7 +74,7 @@ ENTRYPOINT ["dotnet", "SimpleWebHalloWorld.dll"]
 ```
 
 
-## A description of my GitHub pipeline.
+## My GitHub Pipeline.
 
 My pipeline has one workflow, called ".NET", which contains two jobs. Both jobs run whenever something is pushed to the "master". branch or a pull_request event occurs on the "master" branch. The first job, called "build", is not necessary or relevant to this exercise, so we'll skip discussing that one.
 
@@ -91,7 +91,7 @@ The addresses of the registries for the login processes are specified, as well a
 These usernames and passwords are not hardcoded since we don't want to expose that information publicly. Instead we use secrets, but more on that later.
 
 
-### My workflow file:
+### My Workflow file:
 If you'd prefer to read this in my github repo, [click here][github-com-apprepo-myfork-workflow-pipeline-file].
 
 ```yaml
@@ -188,6 +188,7 @@ The [recommended (by Docker)][[github-com-docker-login-action-repo-authenticatio
 ![Github Repository Secrets - Docker Hub authentication info](/Molnapplikationer-Blogg/data/images/exercise-3-containers-and-orchestration/github-repo-secrets-for-docker-hub.png)
 
 The tokens are used in my workflow file here:
+
 ![Workflow file - login action for Docker's registry](/Molnapplikationer-Blogg/data/images/exercise-3-containers-and-orchestration/github-repo-actions-workflow-login-action-docker.png)
 
 
