@@ -90,90 +90,27 @@ The addresses of the registries for the login processes are specified, as well a
 
 These usernames and passwords are not hardcoded since we don't want to expose that information publicly. Instead we use secrets, but more on that later.
 
+Finally we build the image with the `docker/build-push-action` where we specify the registries we want to push our image to and set a "version tag" (e.g. "latest" or "9").
+
+![Workflow file - login action for Docker's registry](/Molnapplikationer-Blogg/data/images/exercise-3-containers-and-orchestration/github-repo-actions-workflow-build-push-action.png)
+
+`{% raw %}${{ github.run_number }}{% endraw %}` is a unique number representing the number of times this workflow has executed, a version if you will.
+
+Here we tell our workflow to push our image to:
+- GitHub Container Registry:
+  - `ghcr.io/johancz/simplewebhalloworld` with the "tag": `latest`
+  - `ghcr.io/johancz/simplewebhalloworld` 
+  > where `ghcr.io` is the registry, `johancz` is the namespace/user and `simplewebhalloworld`.
+- Docker Hub:
+  - `docker.io/johancz/simplewebhalloworld` with the "tag": `latest`
+  - `docker.io/johancz/simplewebhalloworld`
+  > where `docker.io` is the registry, `johancz` is the namespace/user and `simplewebhalloworld`.
+
 
 ### My Workflow file:
 If you'd prefer to read this in my github repo, [click here][github-com-apprepo-myfork-workflow-pipeline-file].
 
-```yaml
-name: .NET
-
-# Trigger the workflow whenever something is pushed to the 'master' branch or a "pull_request" event occurs (for more on what a "pull_request" event is and its activity types see here: https://docs.github.com/en/actions/reference/events-that-trigger-workflows#pull_request)
-on:
-  push:
-    branches: [ master ]
-  pull_request:
-    branches: [ master ]
-
-jobs:
-  # Build and test the app. This job was described in detail in my blog post for the 2nd exercise of this course, see here: https://johancz.github.io/Molnapplikationer-Blogg/2021/09/09/exercise-2-Continuous-Integration#my-github-actions-workflow-yaml-file
-  build:
-    runs-on: ubuntu-latest
-    steps:
-    - uses: actions/checkout@v2
-    - name: Setup .NET
-      uses: actions/setup-dotnet@v1
-      with:
-        dotnet-version: 3.1.x
-    - name: Restore dependencies
-      run: dotnet restore
-    - name: Build
-      run: dotnet build --no-restore
-    - name: Test
-      run: dotnet test --no-build --verbosity normal
-
-  # The jobs which builds and pushes our images to two repositories, Github's container repository (GHCR) and Docker Hub.
-  build-and-push-docker-image:
-    runs-on: ubuntu-latest
-    env:
-      # Set the default working directory for all "run" steps on this workflow.
-      working-directory: .
-    steps:
-    # This task checks-out the repository so that the workflow can access it. 
-    - name: Checkout code
-      uses: actions/checkout@v2.3.4
-    # TODO: maybe remove this task
-    - name: Docker metadata
-      id: meta
-      uses: docker/metadata-action@v3
-      with:
-        # images: johancz/simplewebhalloworld
-        images: ${{ env.REGISTRY }}/${{ env.IMAGE_NAME }}
-    # Login to GitHub Container Registry (GHCR) (with the login action by Docker).
-    - name: Login to GitHub Container Registry
-      uses: docker/login-action@v1.10.0
-      with:
-        # Specify the registry we want to push to.
-        registry: ghcr.io
-        # Set authentication information:
-        # Set username, the username in this case is my Github username (specified with "github.actor").
-        username: ${{ github.actor }};
-        # And the password is set with "secrets.GITHUB_TOKEN" (which is a token automatically provided by Github which can be used on this (and only this repository).
-        password: ${{ secrets.GITHUB_TOKEN }}
-    # Login to Docker Hub (with the login action by Docker).
-    - name: Log in to Docker Hub
-      uses: docker/login-action@v1.10.0
-      with:
-        registry: docker.io # This is unnecessary since it defaults to Docker's registry unless specified.
-        username: ${{ secrets.DOCKER_USERNAME }}
-        password: ${{ secrets.DOCKER_PASSWORD }}
-    # The build and push task makes use of Docker's build-push action. This task builds an image and pushes it to GHCR.
-    - name: Build and push
-      id: docker_build
-      # Here I specify to use Docker's build-push action, 
-      uses: docker/build-push-action@v2.7.0
-      with:
-        push: true
-        # Set the build context.
-        context: ${{env.working-directory}}
-        # Specify the registries we want to push our image to and set a "version tag" (e.g. "latest" or "9").
-        # The format is: "registry/namespace/repository:version" (in my case the namespace on both registries is my username "johancz")
-        tags: |
-          ghcr.io/johancz/simplewebhalloworld:latest
-          ghcr.io/johancz/simplewebhalloworld:${{ github.run_number }}
-          docker.io/johancz/simplewebhalloworld:latest
-          docker.io/johancz/simplewebhalloworld:${{ github.run_number }}
-```
-
+![Workflow file - login action for Github's registry](/Molnapplikationer-Blogg/data/images/exercise-3-containers-and-orchestration/github-repo-actions-workflow-file.png)
 
 ## How did I handle secrets?
 
@@ -205,6 +142,10 @@ The tokens are used in my workflow file here:
 - [Publishing Docker images - docs.github.com][docs-github-com-publish-docker-images]
 - [".NET" starter Workflow - Github Actions][github-com-actions-starter-workflows-dotnet]
 - [Docker build-push action repository and documentaiton][github-com-buildpush-action]
+- [Getting Started With ASP.NET Core & Docker][Getting-Started-With-ASP.NET-Core-&-Docker]:
+- [How YOU can Dockerize a .Net Core app][How-YOU-can-Dockerize-a-.Net-Core-app]
+- [Get started with Docker Compose][Get-started-with-Docker-Compose]
+- [A Practical Introduction to Docker Compose][A-Practical-Introduction-to-Docker-Compose]
 
 
 [docs-docker-com-dockerfile-reference]: https://docs.docker.com/engine/reference/builder/
@@ -221,3 +162,7 @@ The tokens are used in my workflow file here:
 [github-com-apprepo-commit-dockercomposefile]: https://github.com/johancz/SimpleWebHalloWorld/commit/ce9ff9935ab082203036151d61f8e387573d6ad7#diff-e45e45baeda1c1e73482975a664062aa56f20c03dd9d64a827aba57775bed0d3
 [github-com-docker-login-action-repo-authentication-docker-hub]: https://github.com/docker/login-action#docker-hub
 [github-com-docker-login-action-repo-authentication-ghcr]: https://github.com/docker/login-action#github-container-registry
+[Getting-Started-With-ASP.NET-Core-&-Docker]: https://morioh.com/p/5414a74be39d
+[How-YOU-can-Dockerize-a-.Net-Core-app]: https://softchris.github.io/pages/dotnet-dockerize.html
+[Get-started-with-Docker-Compose]: https://docs.docker.com/compose/gettingstarted/
+[A-Practical-Introduction-to-Docker-Compose]: https://hackernoon.com/practical-introduction-to-docker-compose-d34e79c4c2b6
