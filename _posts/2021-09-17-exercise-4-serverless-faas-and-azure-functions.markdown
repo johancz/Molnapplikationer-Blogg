@@ -5,10 +5,6 @@ date:   2021-09-17 23:12
 tags: serverless, FaaS, Azure, Azure Functions, GitHub Actions 
 ---
 
-<h1 style="color:red">Alt. text on images!</h1>
-<h1 style="color:red">Alt. text on images!</h1>
-<h1 style="color:red">Alt. text on images!</h1>
-
 
 ## What is Serverless and Function As A Service (FaaS)?
 
@@ -207,9 +203,17 @@ There really aren't that many security threats for this simple mini calculator, 
 - [Azure Functions Action template - Github Marketplace][github-marketplace-azure-functions-action-dotnet-template]
 - [REST Client for Visual Studio Code][vs-code-rest-client-extension]
 - [Azure Portal][link-azure-portal]
+- [OWASP Serverless Top 10][link-owasp-serverless-top-10]
+- [Intro to Azure Functions - What they are and how to create and deploy them - IAmTimCorey (Youtube)][link-youtube-intro-to-azure-functions]
+- [Understanding Serverless Computing for the Beginner - geekflare.com][geekflare-know-about-serverless]
+- [Serverless computing - azure.microsoft.com][azure-microsoft-serverless-computing]
 
 
 [github-marketplace-azure-functions-action]: https://github.com/marketplace/actions/azure-functions-action
 [github-marketplace-azure-functions-action-dotnet-template]: https://github.com/Azure/actions-workflow-samples/blob/master/FunctionApp/windows-dotnet-functionapp-on-azure.yml
 [vs-code-rest-client-extension]: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
 [link-azure-portal]: https://portal.azure.com/#home
+[link-owasp-serverless-top-10]: https://owasp.org/www-project-serverless-top-10/
+[link-youtube-intro-to-azure-functions]: https://www.youtube.com/watch?v=zIfxkub7CLY
+[geekflare-know-about-serverless]: https://geekflare.com/know-about-serverless/
+[azure-microsoft-serverless-computing]: https://azure.microsoft.com/en-us/overview/serverless-computing/
