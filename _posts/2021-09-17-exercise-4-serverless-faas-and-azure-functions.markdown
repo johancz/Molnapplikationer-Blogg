@@ -38,6 +38,76 @@ FaaS is an event driven execution model where functions/logic are deployed to st
 
 ### An overview of the code:
 
+```csharp
+using System;
+using System.IO;
+using System.Threading.Tasks;
+using Microsoft.AspNetCore.Mvc;
+using Microsoft.Azure.WebJobs;
+using Microsoft.Azure.WebJobs.Extensions.Http;
+using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
+using System.Text.RegularExpressions;
+using System.Linq;
+using System.Data;
+
+namespace Azure_Functions_Mini_Calculator
+{
+    public static class CalculateFunction
+    {
+        [FunctionName("CalculateFunction")]
+        public static async Task<IActionResult> Run(
+            [HttpTrigger(AuthorizationLevel.Function, "get", "post", Route = null)] HttpRequest req,
+            ILogger log)
+        {
+            log.LogInformation("C# HTTP trigger function processed a request.");
+
+            string inputString1 = req.Query["input1"];
+            string inputString2 = req.Query["input2"];
+            string queryToCalculate = req.Query["calculate"];
+
+            string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+            dynamic data = JsonConvert.DeserializeObject(requestBody);
+
+            inputString1 = inputString1 ?? data?.input1;
+            inputString2 = inputString2 ?? data?.input2;
+            queryToCalculate = queryToCalculate ?? data?.calculate;
+
+            string okResponseMessage = "";
+
+            if (double.TryParse(inputString1, out double input1) && double.TryParse(inputString2, out double input2))
+            {
+                okResponseMessage = $"{inputString1} + {inputString2} = {input1 + input2}";
+            }
+            else
+            {
+                try
+                {
+                    double result = Convert.ToDouble(new DataTable().Compute(queryToCalculate, null));
+                    okResponseMessage = $"{queryToCalculate} = {result}";
+                }
+                catch (Exception)
+                {
+                    return new BadRequestObjectResult("Invalid input data!");
+                }
+            }
+
+            return new OkObjectResult(okResponseMessage);
+        }
+    }
+}
+```
+
+The app is triggered by an Http request, both GET and POST requests will trigger it. The app once triggered logs the request and then fetches the values from the query for the three query parameters; `input1`, `input2`, and `calculate`. A `StreamReader` reads the body of the request which is then deserialized (JSON to a `dynamic` object).
+
+Next it will check if our three query parameters actually have values, if they don't (i.e. they are `null`). If any of them are null, it will attempt to find the parameter in the body of the request. If the parameters is not found in either the query string or the body, the app will eventually return a "Bad Request" with the message "Invalid input data!".
+
+Next we try to parse the strings `inputString1` and `inputString2` to `doubles`. If both of them can be parsed, we set `okResponseMessage` to the result of the two numbers added together. If at least one of the parameters cannot be parsed, we try to compute any equation found in the `calculate` parameter using the `DataTable` class and its `Compute` function and the result is then converted to a double and we set `okResponseMessage` to the result of the equation. If `DataTable().Compute()` cannot compute the equation (i.e. invalid input) it will throw and we catch the exception and return "Bad Request" with the "Invalid input data!".
+
+If we successfully calculated a result, we return the result (stored in `okResponseMessage`) within an "Ok" result.
+
+
 ### How to get your project to run in Azure Functions
 
 Begin by creating a new Azure Functions project with Visual Studio.
@@ -188,14 +258,21 @@ By intalling the [REST Client][vs-code-rest-client-extension] extension for Visu
 ![Testing of Azure Functions app with REST Client for Visual Studio Code](/Molnapplikationer-Blogg/data/images/exercise-4-serverless-faas-azure-functions/Visual-Studio-Code-Rest-Client-testing-2.png)
 
 
-### Vilka säkerhets hot finns där till en applikation om din (beskriv minst en)?
+### What potential security threats are there for my app or apps like it? And what did I do to secure my apps against them?
 
-There really aren't that many security threats for this simple mini calculator, I'm not using a database, nor am I in any way dealing with sensitive data. I'm not dealing with authentication of users, beyond requiring a function key to 
+Serverless apps generally have more security threats than normal apps due the increased number of inputs and triggers.
 
-#### Och har du gjort något för att säkra dig emot dissa? (hint: OWASP top 10 - Interpretation for Serverless)
+There really aren't that many security threats for this simple mini calculator, I'm not using a database, nor am I in any way dealing with sensitive data. I'm not dealing with authentication of users, beyond requiring a function key to make API calls. We can however disregard this for the sake of the exercise.
+
+If we consult [OWASP top 10 - Interpretation for Serverless][link-owasp-serverless-top-10], one potential security risk is injection. An attacker could attempt to manipulate input in such as way that they gain access to sensitive data.
+
+To prevent injection based attack I validate the input with TryParse and only if the data is valid do I proceed to add the two numbers together. Any invalid input will result in a "Bad Request"
 
 
-<!-- -->
+If my app was to have input fields on the page, XSS (Cross Side Scripting) could present further security threats.
+
+I do rely on the use of a "publish profile" to authenticate against Azure in my GitHub Actions pipeline.
+If the data in file were to be exposed it would present serious security issues. Attacks would for example have means to publish malicious content to my Functions app. To solve this I store my publish profile as GitHub repository secret.
 
 
 ## Sources & Links
