@@ -1,7 +1,7 @@
 ---
 layout: post
 title:  "Exercise 4 - Serverless, FaaS and Azure Functions"
-date:   2021-09-17 14:21
+date:   2021-09-17 23:12
 tags: serverless, FaaS, Azure, Azure Functions, GitHub Actions 
 ---
 
@@ -155,13 +155,16 @@ on:
 3. Change the value of `AZURE_FUNCTIONAPP_NAME` to the name of your Azure Function.
 4. Change the value of `AZURE_FUNCTIONAPP_PACKAGE_PATH` to the path to the directory of your source code.
 5. Change the value of `DOTNET_VERSION` to the dotnet version you are using in your project.
-6. Push your new workflow file to your master branch.
+6. Push your new workflow file to your master ("main") branch and the pipeline to deploy to Azure Functions is now live.
+
+When a commit is pushed to "main", it will attempt to build and publish it to Azure Functions. If it succeeds you'll see this.
+
+![Azure Functions action template](/Molnapplikationer-Blogg/data/images/exercise-4-serverless-faas-azure-functions/github-actions-pipeline-success.png)
 
 
 ### How did I test the application?
 
 I have only tested my function with the Rest Client extension for Visual Studio Code and with the "Test/Run" functionality on the Azure Portal.
-
 
 #### Azure Portal
 
@@ -185,6 +188,8 @@ You should now see the output:
 By intalling the [REST Client][vs-code-rest-client-extension] extension for Visual Studio Code I can make API calls to test my Azure Functions app like so:
 
 ![Testing of Azure Functions app with REST Client for Visual Studio Code](/Molnapplikationer-Blogg/data/images/exercise-4-serverless-faas-azure-functions/Visual-Studio-Code-Rest-Client-testing.png)
+
+![Testing of Azure Functions app with REST Client for Visual Studio Code](/Molnapplikationer-Blogg/data/images/exercise-4-serverless-faas-azure-functions/Visual-Studio-Code-Rest-Client-testing-2.png)
 
 
 ### Vilka säkerhets hot finns där till en applikation om din (beskriv minst en)?
