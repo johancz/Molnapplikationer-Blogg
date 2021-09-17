@@ -42,8 +42,6 @@ FaaS is an event driven execution model where functions/logic are deployed to st
 
 ### An overview of the code:
 
-<!-- -->
-
 ### How to get your project to run in Azure Functions
 
 Begin by creating a new Azure Functions project with Visual Studio.
@@ -102,16 +100,68 @@ Click "Publish" and if everything goes as planned you get a message saying the a
 
 ![Configure your Azure Functions app before publishing](/Molnapplikationer-Blogg/data/images/exercise-4-serverless-faas-azure-functions/Visual-Studio-new-Azure-Functions-project-solution-explorer-publish-published.png)
 
+Congratulation, you have published your app to Azure Functions. 🍰
 
-#### Screenshots:
-#### Scrips:
-#### Pipelines
 
-<!-- -->
+#### Deploy to Azure Functions with a GitHub Actions pipeline
+
+> First create a github repository and push your code if you don't already have a repository.
+
+What you want to do now is set up some authentication to be able to deploy from a Github Action.
+
+Begin by navigating to your Azure Functions app on the [Azure Portal][link-azure-portal].
+
+Click "Get publish profile" (as in in the image below) and save it to your computer.
+
+![Azure Function publish profile](/Molnapplikationer-Blogg/data/images/exercise-4-serverless-faas-azure-functions/Azure-Porta-Function-get-publish-profile.png)
+
+<div class="alert alert-info" role="alert"><i class="fa fa-info-circle"></i> <b>Warning:</b> This file contains sensitive data, so make sure you don't publish it or push it to your git repository.</div>
+
+
+What you want to do next is to copy the contents of the "publish profile" and save it as a GitHub secret.
+To do this:
+1. Navigate to your GitHub repository.
+2. Click "Setting".
+3. Click "Secrets".
+4. In the "Name" field enter: `AZURE_FUNCTIONAPP_PUBLISH_PROFILE`
+5. Copy the contents of the "publish profile" file you downloaded and paste it into the "Value" box.
+6. Click "Add secret".
+
+You can now use this secret in your pipeline to authenticate against Azure when deploying your app.
+
+![Azure Function publish profile](/Molnapplikationer-Blogg/data/images/exercise-4-serverless-faas-azure-functions/github-repository-secret-new.png)
+
+
+To publish to Azure Functions with Github Actions you can use [this action on the Github Marketplace][github-marketplace-azure-functions-action]
+
+Start by copying the template to a new workflow file, e.g. `./.github/workflows/`.
+
+Let's make changes to the template:
+
+![Azure Functions action template](/Molnapplikationer-Blogg/data/images/exercise-4-serverless-faas-azure-functions/Azure-Functions-action-template-editthese.png)
+
+1. (Optional) Change the name of the action.
+2. To make sure you only publish your app when you push to your master branch, change the "On" variable from this:
+```yaml
+on:
+  [push]
+```
+to this:
+```yaml
+on:
+    push:
+        branches: [ main ]
+```
+3. Change the value of `AZURE_FUNCTIONAPP_NAME` to the name of your Azure Function.
+4. Change the value of `AZURE_FUNCTIONAPP_PACKAGE_PATH` to the path to the directory of your source code.
+5. Change the value of `DOTNET_VERSION` to the dotnet version you are using in your project.
+6. Push your new workflow file to your master branch.
+
 
 ### How did I test the application?
 
 I have only tested my function with the Rest Client extension for Visual Studio Code and with the "Test/Run" functionality on the Azure Portal.
+
 
 #### Azure Portal
 
@@ -130,17 +180,31 @@ You should now see the output:
 ![Testing of Azure Functions app on Azure portal - steps and input](/Molnapplikationer-Blogg/data/images/exercise-4-serverless-faas-azure-functions/Azure-dotcom-function-management-testrun-output.png)
 
 
-<!-- -->
+#### Testing with REST Client for Visual Studio Code
+
+By intalling the [REST Client][vs-code-rest-client-extension] extension for Visual Studio Code I can make API calls to test my Azure Functions app like so:
+
+![Testing of Azure Functions app with REST Client for Visual Studio Code](/Molnapplikationer-Blogg/data/images/exercise-4-serverless-faas-azure-functions/Visual-Studio-Code-Rest-Client-testing.png)
+
 
 ### Vilka säkerhets hot finns där till en applikation om din (beskriv minst en)?
+
+There really aren't that many security threats for this simple mini calculator, I'm not using a database, nor am I in any way dealing with sensitive data. I'm not dealing with authentication of users, beyond requiring a function key to 
+
 #### Och har du gjort något för att säkra dig emot dissa? (hint: OWASP top 10 - Interpretation for Serverless)
+
 
 <!-- -->
 
 
 ## Sources & Links
-- [link label][link-id]
+- [Azure Functions Action - Github Marketplace][github-marketplace-azure-functions-action]
+- [Azure Functions Action template - Github Marketplace][github-marketplace-azure-functions-action-dotnet-template]
+- [REST Client for Visual Studio Code][vs-code-rest-client-extension]
+- [Azure Portal][link-azure-portal]
 
 
-
-[link-id]: url
+[github-marketplace-azure-functions-action]: https://github.com/marketplace/actions/azure-functions-action
+[github-marketplace-azure-functions-action-dotnet-template]: https://github.com/Azure/actions-workflow-samples/blob/master/FunctionApp/windows-dotnet-functionapp-on-azure.yml
+[vs-code-rest-client-extension]: https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+[link-azure-portal]: https://portal.azure.com/#home
