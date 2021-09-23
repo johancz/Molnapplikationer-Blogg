@@ -320,8 +320,8 @@ These are the estimates:
 The Azure Functions uses the "Consumption" tier and the CosmosDB operations are serverless. All plans utilize 2 periodic backup copies
 
 
-   ### Small user base (smallest possible number of CosmosDB RU/s):
-   ### Massive user base:
+   <!-- ### Small user base (smallest possible number of CosmosDB RU/s):
+   ### Massive user base: -->
 
 
 ## Sources & Links
