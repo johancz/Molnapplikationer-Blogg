@@ -5,6 +5,8 @@ date:   2021-09-22 23:23
 tags: Azure SQL, Cosmos DB, Azure Functions
 ---
 
+<h1 style="color:red;">WIP, not complete!</h1>
+
 ## Preface
 This is the assignment for the 5th session of the course "Cloud Applications" @ Teknikhögskolan Göteborg.
 
@@ -20,13 +22,137 @@ There are three levels (only one is mandatory):
 ## The application
 ## Beskriv kort applikationen, vad gör den?
 
-   ### Ideas:
-   - todo
-   - notes
-   - chat
+The application is a very basic notes app. You can add a new note or fetch all notes.
 
 ## Beskriv koden
 ## The code
+
+My Azure Functions app has two functions, one handling `POST` requests on the "api/note" endpoint, and the other handles `GET` requets on the same endpoint ("api/note").
+
+### The `POST` "api/note" handler:
+
+The function's name is "AddNote" and it's job is to handle `POST` requests on the "api/note" endpoint, and using the data in the request body to add a new note to the database.
+The function is triggered by an HTTP request, and it uses an instance of `DocumentClient` (which is provided by the `CosmosDB` binding we use) to asynchronously add a new document using the `CreateDocumentAsync` method (but more on that later).
+
+* To use the `CosmosDB` binding we first need to be add [the relevant NuGet package][link-nuget-package-azure-cosmosdb-bindings], which we can install by adding the following to our project file:
+  ```csharp
+  <PackageReference Include="Microsoft.Azure.WebJobs.Extensions.CosmosDB" Version="3.0.0-beta7" />
+  ```
+
+  The binding is then used to specify our database connection string with the `ConnectionStringSetting` property.
+  ```csharp
+  [CosmosDB(ConnectionStringSetting = "CosmosDbConnectionString")] DocumentClient client,
+  ```
+  For local development we store the connection string in `local.settings.json` in our source directory, which looks like this:
+
+  ![](/Molnapplikationer-Blogg/data/images/exercise-5-cloud-databases/azure-functions-vs-project-local-settings-json.png)
+
+  and in the Azure Portal we stored this string in the function's "Application settings", see the image below:
+
+  ![](/Molnapplikationer-Blogg/data/images/exercise-5-cloud-databases/azure-portal-azure-function-config-db-connection-string.png)
+
+
+* Before the new document can be created we need to extract the data from the request body, which is done with a `StreamReader` instance.
+The asynchronous `StreamReader.ReadToEndAsync()` method returns a string with all of the data in the body which we then need to deserialize into a `NoteDTO` object. From this object we create a new `Note` object which can be used by `CreateDocumentAsync` like so:
+
+  > Before we create the new document, we need to create a document collection link in the form and a `Uri`, which is used by the `CreateDocumentAsync` method to create the document in the correct collection.
+
+  ```csharp
+  Uri driverCollectionUri = UriFactory.CreateDocumentCollectionUri(databaseId: "NotesApp", collectionId: "Items");
+  Document doc = await client.CreateDocumentAsync(driverCollectionUri, note);
+  ```
+
+
+* What we get back is the newly inserted document (our note).
+The document is then serialized to `JSON` and immediately deserialized to a `NoteDTO` data transfer object (DTO). I use a DTO to control what data is returned to the user.
+
+  > A DTO might not be strictly necessary for our purposes, but I think it's good practice to always control what is returned to the user. The `Note` class might be changed in the future, which could lead to this method returning data we don't want to expose to the user (if it was returning a `Note` object directly that is).
+
+* Finally this DTO is returned in an `OkObjectResult` object.
+  ```csharp
+  noteDto = JsonConvert.DeserializeObject<NoteDTO>(JsonConvert.SerializeObject(doc));
+  return new OkObjectResult(noteDto);
+  ```
+
+* Should anything at any point fail inside our the try-catch statement, a `BadRequestObjectResult` is instead returned and the exception's message is logged.
+  ```csharp
+  catch (Exception e)
+  {
+      log.LogError($"Could not add new item to collection. Exception: {e.Message}");
+      return new BadRequestObjectResult(e.Message);
+  }
+  ```
+
+  #### The method in its entirety:
+
+  ```csharp
+  [FunctionName("AddNote")]
+  public static async Task<IActionResult> AddNote(
+      [HttpTrigger(AuthorizationLevel.Function, "post", Route = "note")] HttpRequest req,
+      [CosmosDB(ConnectionStringSetting = "CosmosDbConnectionString")] DocumentClient client,
+      ILogger log)
+  {
+      log.LogInformation("C# HTTP trigger function processed a request.");
+
+      try
+      {
+          string requestBody = await new StreamReader(req.Body).ReadToEndAsync();
+          NoteDTO noteDto = JsonConvert.DeserializeObject<NoteDTO>(requestBody);
+
+          Note note = new Note
+          {
+              Title = noteDto.Title,
+              Data = noteDto.Data,
+              User = noteDto.User
+          };
+
+          Uri driverCollectionUri = UriFactory.CreateDocumentCollectionUri(databaseId: "NotesApp", collectionId: "Items");
+          Document doc = await client.CreateDocumentAsync(driverCollectionUri, note);
+
+          noteDto = JsonConvert.DeserializeObject<NoteDTO>(JsonConvert.SerializeObject(doc));
+          return new OkObjectResult(noteDto);
+      }
+      catch (Exception e)
+      {
+          log.LogError($"Could not add new item to collection. Exception: {e.Message}");
+          return new BadRequestObjectResult(e.Message);
+      }
+  }
+  ```
+
+### The `GET` "api/note" handler:
+
+This function is similar to the `POST` handler described above, but significantly simpler.
+
+Instead of creating a document collection link we specify the database and collection directly in the `CosmosDB` binding like so:
+```csharp
+[CosmosDB(
+    databaseName: "NotesApp",
+    collectionName: "Items",
+    ConnectionStringSetting = "CosmosDbConnectionString")] DocumentClient client,
+```
+
+  #### The method in its entirety:
+```csharp
+[FunctionName("GetNotes")]
+public static async Task<IActionResult> GetNotes(
+    [HttpTrigger(AuthorizationLevel.Function, "get", Route = "note")] HttpRequest req,
+    [CosmosDB(
+        databaseName: "NotesApp",
+        collectionName: "Items",
+        ConnectionStringSetting = "CosmosDbConnectionString")] DocumentClient client,
+    ILogger log)
+{
+    // Query options
+    FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1, EnableCrossPartitionQuery = true };
+
+    // Get all notes
+    IQueryable<Note> userQuery = client.CreateDocumentQuery<Note>(
+        UriFactory.CreateDocumentCollectionUri("NotesApp", "Items"), queryOptions);
+
+    return new OkObjectResult(userQuery);
+}
+```
 
 ## Beskriv databasen
 ## The database
@@ -45,7 +171,8 @@ There are three levels (only one is mandatory):
 
 
 ## Sources & Links
-- [link-label][link-id]
+- [Azure Cosmos DB input binding for Azure Functions 2.x and higher - docs.microsoft.com][link-docs-microsoft-azure-functions-bindings-cosmosdb]
 
 
-[link-id]: link-url
+[link-docs-microsoft-azure-functions-bindings-cosmosdb]: https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-cosmosdb-v2-input?tabs=csharp
+[link-nuget-package-azure-cosmosdb-bindings]: https://www.nuget.org/packages/Microsoft.Azure.WebJobs.Extensions.CosmosDB
