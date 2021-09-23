@@ -124,35 +124,74 @@ The document is then serialized to `JSON` and immediately deserialized to a `Not
 
 This function is similar to the `POST` handler described above, but significantly simpler.
 
-Instead of creating a document collection link we specify the database and collection directly in the `CosmosDB` binding like so:
+<!-- Instead of creating a document collection link we specify the database and collection directly in the `CosmosDB` binding like so:
 ```csharp
 [CosmosDB(
     databaseName: "NotesApp",
     collectionName: "Items",
     ConnectionStringSetting = "CosmosDbConnectionString")] DocumentClient client,
-```
+``` -->
+
+* We still use the `DocumentClient` provided by the database binding, but this time we instead use the `CreateDocumentQuery` method to insert a new document into our collection ("Items").
+
+* We then set up some query options:
+  ```csharp
+    FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1, EnableCrossPartitionQuery = true };
+  ```
+  `MaxItemCount = -1` to get all matching documents. `MaxItemCount` is used if we want to use pagination.
+  `EnableCrossPartitionQuery = true` to query across all physical partitions in the database.
+
+* Next we create the query/queryable, again creating a document collection uri, and we use the query options here.
+  ```csharp
+      var queryable = client.CreateDocumentQuery<Note>(UriFactory.CreateDocumentCollectionUri("NotesApp", "Items"), queryOptions).AsDocumentQuery();
+  ```
+
+  > This query gives us all document in the collection "Items", and the resulting queryable is then converted to a `IDocumentQuery` which has support for pagination and asynchronous execution (the latter being especially important when an operation can return a lot of documents).
+
+* Finally we fetch all documents asynchronously and add each document ("Note") to a list which can be returned to the user.
+  ```csharp
+  List<Note> notes = new List<Note>();
+
+  // Asynchronously fetch all documents and add them to a list.
+  while (queryable.HasMoreResults)
+  {
+      foreach (Note note in await queryable.ExecuteNextAsync<Note>())
+      {
+          notes.Add(note);
+      }
+  }
+
+  return new OkObjectResult(notes);
+  ```
 
   #### The method in its entirety:
-```csharp
-[FunctionName("GetNotes")]
-public static async Task<IActionResult> GetNotes(
-    [HttpTrigger(AuthorizationLevel.Function, "get", Route = "note")] HttpRequest req,
-    [CosmosDB(
-        databaseName: "NotesApp",
-        collectionName: "Items",
-        ConnectionStringSetting = "CosmosDbConnectionString")] DocumentClient client,
-    ILogger log)
-{
-    // Query options
-    FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1, EnableCrossPartitionQuery = true };
+  ```csharp
+  [FunctionName("GetNotes")]
+  public static async Task<IActionResult> GetNotes(
+      [HttpTrigger(AuthorizationLevel.Function, "get", Route = "note")] HttpRequest req,
+      [CosmosDB(ConnectionStringSetting = "CosmosDbConnectionString")] DocumentClient client,
+      ILogger log)
+  {
+      // Query options
+      FeedOptions queryOptions = new FeedOptions { MaxItemCount = -1, EnableCrossPartitionQuery = true };
 
-    // Get all notes
-    IQueryable<Note> userQuery = client.CreateDocumentQuery<Note>(
-        UriFactory.CreateDocumentCollectionUri("NotesApp", "Items"), queryOptions);
+      // Create the query/queryable for getting all documents from the "Items" collection.
+      var queryable = client.CreateDocumentQuery<Note>(UriFactory.CreateDocumentCollectionUri("NotesApp", "Items"), queryOptions).AsDocumentQuery();
 
-    return new OkObjectResult(userQuery);
-}
-```
+      List<Note> notes = new List<Note>();
+
+      // Asynchronously fetch all documents and add them to a list.
+      while (queryable.HasMoreResults)
+      {
+          foreach (Note note in await queryable.ExecuteNextAsync<Note>())
+          {
+              notes.Add(note);
+          }
+      }
+
+      return new OkObjectResult(notes);
+  }
+  ```
 
 ## Beskriv databasen
 ## The database
@@ -171,8 +210,17 @@ public static async Task<IActionResult> GetNotes(
 
 
 ## Sources & Links
+- [Microsoft.Azure.WebJobs.Extensions.CosmosDB - nuget.org/packages][link-nuget-package-azure-cosmosdb-bindings]
 - [Azure Cosmos DB input binding for Azure Functions 2.x and higher - docs.microsoft.com][link-docs-microsoft-azure-functions-bindings-cosmosdb]
+- [Query an Azure Cosmos container - docs.microsoft.com][link-docs-microsoft-cosmos-db-how-to-query-container]
+- [DocumentQueryable.AsDocumentQuery<T>(IQueryable<T>) Method - docs.microsoft.com][link-docs-microsoft-azure-linq-document-queryable-as-document-query]
+- [FeedOptions.MaxItemCount Property - docs.microsoft.com][link-docs-microsoft-azure-linq-document-client-feed-options-maxitemcount]
+- [FeedOptions.EnableCrossPartitionQuery Property - docs.microsoft.com][link-docs-microsoft-azure-linq-document-client-feed-options-enablecrosspartitionquery]
 
 
-[link-docs-microsoft-azure-functions-bindings-cosmosdb]: https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-cosmosdb-v2-input?tabs=csharp
 [link-nuget-package-azure-cosmosdb-bindings]: https://www.nuget.org/packages/Microsoft.Azure.WebJobs.Extensions.CosmosDB
+[link-docs-microsoft-azure-functions-bindings-cosmosdb]: https://docs.microsoft.com/en-us/azure/azure-functions/functions-bindings-cosmosdb-v2-input?tabs=csharp
+[link-docs-microsoft-cosmos-db-how-to-query-container]: https://docs.microsoft.com/en-us/azure/cosmos-db/sql/how-to-query-container
+[link-docs-microsoft-azure-linq-document-queryable-as-document-query]: https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.documents.linq.documentqueryable.asdocumentquery?view=azure-dotnet
+[link-docs-microsoft-azure-linq-document-client-feed-options-maxitemcount]: https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.documents.client.feedoptions.maxitemcount?view=azure-dotnet
+[link-docs-microsoft-azure-linq-document-client-feed-options-enablecrosspartitionquery]: https://docs.microsoft.com/en-us/dotnet/api/microsoft.azure.documents.client.feedoptions.enablecrosspartitionquery?view=azure-dotnet
