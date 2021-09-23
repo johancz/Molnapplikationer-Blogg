@@ -306,15 +306,15 @@ This one is hard since I have no knowledge of how many RU/s (Request Units / sec
 
 I have used the [Azure Calculator][link-azure-calculator]
 Since I don't really know what numbers to input I will as mentioned use the smallest possible and then roughly multiplying those numbers by 10 and 100.
-This means I compare the following in the image below:
+<!-- This means I compare the following in the image below:
 | Plan      | RUs (CosmosDB)   | Transactional Storage (CosmosDB) | Memory Size (Azure Functions) | Executions per month |
 | --------- | ------------------------ | -------------------------------- | ----------------------------- | -------------------- |
 | minimum   | 1,000,000                | 1 GB                             | 128                           | 1,000,000            |
 | x10       | 10,000,000               | 10 GB                            | 1024                          | 10,000,000           |
-| x100      | 100,000,000              | 100 GB                           | 1535                          | 100,000,000          |
+| x100      | 100,000,000              | 100 GB                           | 1535                          | 100,000,000          | -->
 
 
-These are the estimates.
+These are the estimates:
 ![](/Molnapplikationer-Blogg/data/images/exercise-5-cloud-databases/Azure-Calculator-estimates.png)
 
 The Azure Functions uses the "Consumption" tier and the CosmosDB operations are serverless. All plans utilize 2 periodic backup copies
