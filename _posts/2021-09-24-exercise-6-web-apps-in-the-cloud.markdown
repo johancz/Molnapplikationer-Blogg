@@ -5,8 +5,6 @@ date:   2021-09-24 22:39
 tags: Web Apps, Razor Pages, ASP.NET, Azure App Service
 ---
 
-<h1 style="color:red;">WIP, not complete!</h1>
-
 
 ## Preface
 This is the assignment for the 6th session of the course "Cloud Applications" @ Teknikhögskolan Göteborg.
@@ -203,9 +201,9 @@ I opted to keep the app simple and thus it was sufficient to reuse the existing 
 </table>
 ```
 
-This uses the html tag helper `@Html.LabelFor()` to render labels with the name of the properties of the `Note` class (or "Display Names" in our case since we use the `Display` attribute (e.g. `[Display(Name = "Note Title")]`)). The empty `input` and `textarea` elements are rendered with the tag helpers `TextBoxFor` and `TextAreaFor` respectively.
+This uses the html html helper `@Html.LabelFor()` to render labels with the name of the properties of the `Note` class (or "Display Names" in our case since we use the `Display` attribute (e.g. `[Display(Name = "Note Title")]`)). The empty `input` and `textarea` elements are rendered with the html helpers `TextBoxFor` and `TextAreaFor` respectively.
 
-We then loop through all `Notes` fetched with the help of our `CosmosDbService` class and render each note in a loop with the `@Html.DisplayNameFor` and `@Html.DisplayFor` tag helpers.
+We then loop through all `Notes` fetched with the help of our `CosmosDbService` class and render each note in a loop with the `@Html.DisplayNameFor` and `@Html.DisplayFor` html helpers.
 
 ```csharp
 public class IndexModel : PageModel
@@ -292,7 +290,7 @@ In the `IndexModel` we inject the `CosmosDbService` singleton dependency which i
 1. I could then create an Azure Web App in the Azure Portal with these settings (on the "Basics" tab):
     ![](/Molnapplikationer-Blogg/data/images/exercise-6-web-apps/azure-portal-create-resources-create-web-app-details.png)
 
-    And these settings (on the "Docker" tab, to set up the Web App to pull an image from the my ACR):
+    And these settings (on the "Docker" tab, to set up the Web App to pull an image from my ACR):
     ![](/Molnapplikationer-Blogg/data/images/exercise-6-web-apps/azure-portal-create-resources-create-web-app-details-docker-silver-acr.png)
 
 
@@ -302,10 +300,14 @@ In the `IndexModel` we inject the `CosmosDbService` singleton dependency which i
 This are my cost estimate for...
 
 ### a small user base:
-> With 
+> Container Registry is on the `Basic` tier.
+> App Service is on the `Basic` tier with one instances of `B1: 1 core, 1.75 GB RAM, 10 GB Storage`
+> Azure Cosmos DB (Serverless) is setup for `1,000,000 RUs (Request Units)` and with `1 GB` of transactional storage.
+![](/Molnapplikationer-Blogg/data/images/exercise-6-web-apps/azure-cost-estimates-many-users.png)
 ![](/Molnapplikationer-Blogg/data/images/exercise-6-web-apps/azure-cost-estimates-few-users.png)
 
 ### a very large user base:
+> Container Registry is on the `Premium` tier.
 > App Service is on the `Premium v3` tier with three instances of `P3V3: 8 cores, 32 GB RAM 250 GB Storage` and utilizing the 55% discount (3 year reserved instances).
 > Azure Cosmos DB (Serverless) is setup for `100,000,000 RUs (Request Units)` and with `100 GB` of transactional storage.
 ![](/Molnapplikationer-Blogg/data/images/exercise-6-web-apps/azure-cost-estimates-many-users.png)
@@ -329,8 +331,12 @@ Large user base: |        $0.00 |    $765.24
 - [Microsoft.Azure.Cosmos - nuget.com][nuget-package-microsoft-azure-cosmos]
 - [Pushing Docker images to ACR - Azure Container Registry - blog.hildenco.com][link-blog.hildenco-pushing-docker-images-to-azure]
 - [Azure Web App for Containers - youtube.com (Microsoft Student Accelerator)][link-youtube-microsoft-student-accelerator-Azure-Web-App-for-Containers]
+- [Using Forms in Razor Pages (Leveraging Model Binding) - learnrazorpages.com][link-razor-pages-forms-and-model-binding]
+- [Tutorial: Develop an ASP.NET Core MVC web application with Azure Cosmos DB by using .NET SDK - docs.microsoft.com][link-docs-microsoft-azure-cosmosdb-dotnet-web-app-mvc]
 
 
 [nuget-package-microsoft-azure-cosmos]: https://www.nuget.org/packages/Microsoft.Azure.Cosmos
 [link-blog.hildenco-pushing-docker-images-to-azure]: https://blog.hildenco.com/2020/10/pushing-docker-images-to-azure.html
 [link-youtube-microsoft-student-accelerator-Azure-Web-App-for-Containers]: https://www.youtube.com/watch?v=xnUOu-yPEzo
+[link-razor-pages-forms-and-model-binding]: https://www.learnrazorpages.com/razor-pages/forms
+[link-docs-microsoft-azure-cosmosdb-dotnet-web-app-mvc]: https://docs.microsoft.com/en-us/azure/cosmos-db/sql/sql-api-dotnet-application
