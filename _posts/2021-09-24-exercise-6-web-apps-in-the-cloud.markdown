@@ -40,9 +40,6 @@ The database is an "Azure Cosmos DB (Core) SQL" database which has one container
 
 ## The code
 
-I opted to keep the app simple and thus it was sufficient to utilize the existing "Index" Razor Page.
-
-
 ### Services/CosmosDbService and Services/ICosmosDbService
 First I created a class which contains all necessary logic for connecting to and using a Cosmos DB database. This class is later registered in "Startup.cs" as a `Singleton` and can be injected into wherever it is required via dependency injection. The service class implements an interface `ICosmosDbService` and looks like this (please see the comments in the code below for any explanations):
 
@@ -89,24 +86,9 @@ public class CosmosDbService : ICosmosDbService
 
 ### Startup.cs
 
-Startup.cs was only modified with the addition of a method and registration of a dependency.
+Startup.cs was only modified with the addition of a method `InitializeCosmosClientInstanceAsync()` and registration of a dependency.
 
 #### Startup.cs - InitializeCosmosClientInstanceAsync()
-Mext we add a method which reads the database configuration data from the appsettings.json/appsettings.Development.json file. The databasebase configuration data includes; the URI to Cosmos DB account and its primary key, the name of the database and container we'll use. Storing secrets or sensitive data in "appsettings.json" is not recommended, but for the purpose of this assignment it will do since th GitHub repository is private and the database account will be deleted shortly after this blog-post goes live.
-
-It then creates a `CosmosClient` instance (provided by the "Microsoft.Azure.Cosmos" libraray) using the account URI and the primary key. The instance is a "client-side" (Azure Web App) representation of the database account and which can execute requests against our database.
-
-Next we create an instance of our `CosmosDbService` class and feed it our `CosmosClient` instance, database name and container name.
-Finally we create the database and/or container if either does not already exist, and return the `CosmosdbService` instance.
-
-#### Startup.cs - InitializeCosmosClientInstanceAsync()
-We register our service class `CosmosDbService` and a `Singleton` dependency by adding the following to the `ConfigureServices` method:
-```csharp
-services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
-```
-
-This calls the `InitializeCosmosClientInstanceAsync()` method described above.
-
 ```csharp
 private static async Task<CosmosDbService> InitializeCosmosClientInstanceAsync(IConfigurationSection configurationSection)
 {
@@ -123,12 +105,156 @@ private static async Task<CosmosDbService> InitializeCosmosClientInstanceAsync(I
     return cosmosDbService;
 }
 ```
+This method which reads the database configuration data from the appsettings.json/appsettings.Development.json file. The databasebase configuration data includes; the URI to Cosmos DB account and its primary key, the name of the database and container we'll use. Storing secrets or sensitive data in "appsettings.json" is not recommended, but for the purpose of this assignment it will do since th GitHub repository is private and the database account will be deleted shortly after this blog-post goes live.
 
+It then creates a `CosmosClient` instance (provided by the "Microsoft.Azure.Cosmos" libraray) using the account URI and the primary key. The instance is a "client-side" (Azure Web App) representation of the database account and which can execute requests against our database.
 
-The constructor takes a `CosmosClient` instance, a database name and a container name and it creates a `Container` proxy which is saves to a private field.
+Next we create an instance of our `CosmosDbService` class and feed it our `CosmosClient` instance, database name and container name.
+Finally we create the database and/or container if either does not already exist, and return the `CosmosdbService` instance.
 
-This `Container` class has a number of built in methods for writing to and reading from a container, and we use our `Container` proxy to 
+#### Startup.cs - InitializeCosmosClientInstanceAsync()
+We register am instance of our service class `CosmosDbService` as a `Singleton` dependency by adding the following to the `ConfigureServices` method (This calls the `InitializeCosmosClientInstanceAsync()` method described above):
+```csharp
+services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(Configuration.GetSection("CosmosDb")).GetAwaiter().GetResult());
+```
 
+### The "Note" Model class
+```csharp
+public class Note
+{
+    [JsonProperty(PropertyName = "id")]
+    public string Id { get; set; }
+
+    [JsonProperty(PropertyName = "title")]
+    [Display(Name = "Note Title")]
+    public string Title { get; set; }
+
+    [JsonProperty(PropertyName = "data")]
+    [Display(Name = "Note Contents")]
+    public string Data { get; set; }
+
+    [JsonProperty(PropertyName = "created")]
+    [Display(Name = "Created")]
+    public DateTime Created { get; set; }
+}
+```
+### Index.cshtml and Index.cshtml.cs
+
+I opted to keep the app simple and thus it was sufficient to reuse the existing "Index" Razor Page to; present a form for adding a new note, and to render an HTML table for displaying all of the notes fetched from the database.
+
+```cshtml
+@page
+@model IndexModel
+@{
+    ViewData["Title"] = "Notes";
+}
+
+<h2>New Note</h2>
+
+<form method="post">
+    <div class="form-group">
+        @Html.LabelFor(m => m.NewNote.Title):
+        <br />
+        @Html.TextBoxFor(m => m.NewNote.Title)
+
+        <br />
+
+        @Html.LabelFor(m => m.NewNote.Data):
+        <br />
+        @Html.TextAreaFor(m => m.NewNote.Data)
+    </div>
+
+    <div class="form-group">
+        <button type="submit" class="btn btn-primary">Create</button>
+    </div>
+</form>
+
+<h2>All Notes</h2>
+
+<table class="table">
+    <tr>
+        <th>
+            @Html.DisplayNameFor(m => m.Notes.ElementAt(0).Title)
+        </th>
+        <th>
+            @Html.DisplayNameFor(m => m.Notes.ElementAt(0).Data)
+        </th>
+        <th>
+            @Html.DisplayNameFor(m => m.Notes.ElementAt(0).Created)
+        </th>
+        <th></th>
+    </tr>
+
+    @foreach (var item in Model.Notes)
+    {
+        <tr>
+            <td>
+                @Html.DisplayFor(m => item.Title)
+            </td>
+            <td>
+                @Html.DisplayFor(m => item.Data)
+            </td>
+            <td>
+                @Html.DisplayFor(m => item.Created)
+            </td>
+        </tr>
+    }
+
+</table>
+```
+
+This uses the html tag helper `@Html.LabelFor()` to render labels with the name of the properties of the `Note` class (or "Display Names" in our case since we use the `Display` attribute (e.g. `[Display(Name = "Note Title")]`)). The empty `input` and `textarea` elements are rendered with the tag helpers `TextBoxFor` and `TextAreaFor` respectively.
+
+We then loop through all `Notes` fetched with the help of our `CosmosDbService` class and render each note in a loop with the `@Html.DisplayNameFor` and `@Html.DisplayFor` tag helpers.
+
+```csharp
+public class IndexModel : PageModel
+{
+    private readonly ILogger<IndexModel> _logger;
+    private readonly ICosmosDbService _cosmosDbService;
+
+    public IEnumerable<Note> Notes { get; set; }
+
+    [BindProperty]
+    public Note NewNote { get; set; }
+
+    // Inject the `CosmosDbService` instance for use by this page model.
+    public IndexModel(ILogger<IndexModel> logger, ICosmosDbService cosmosDbService)
+    {
+        _logger = logger;
+        _cosmosDbService = cosmosDbService;
+    }
+
+    public async Task<ActionResult> OnGetAsync()
+    {
+        // Fetch all `Notes` from the database and store them in an IEnumerable<Note>
+        Notes = await _cosmosDbService.GetItemsAsync("SELECT * FROM c");
+        // Render the page.
+        return Page();
+    }
+
+    public async Task<RedirectToPageResult> OnPostAsync()
+    {
+        // Since the `NewNote` property is bound to the model we immediately have access to the data posted with the page's form.
+
+        // Validation for the future.
+        if (ModelState.IsValid)
+        {
+            // Create a unique id for the new `Note`.
+            NewNote.Id = Guid.NewGuid().ToString();
+            // Set the date & time for when the `note` was created.
+            NewNote.Created = DateTime.Now;
+            // Add the new `Note` as a document to the `NoteItems` container.
+            await _cosmosDbService.AddItemAsync(NewNote);
+        }
+
+        // Effectively reloads the page we're on so that the new note is shown in the list below the form.
+        return RedirectToPage("index");
+    }
+}
+```
+
+In the `IndexModel` we inject the `CosmosDbService` singleton dependency which is then used by the `OnGetAsync` and `OnPostAsync` methods for fetching all notes and posting a new one.
 
 
 ## Getting it up and running in Azure App Service
