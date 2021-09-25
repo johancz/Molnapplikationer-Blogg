@@ -105,7 +105,7 @@ private static async Task<CosmosDbService> InitializeCosmosClientInstanceAsync(I
     return cosmosDbService;
 }
 ```
-This method which reads the database configuration data from the appsettings.json/appsettings.Development.json file. The databasebase configuration data includes; the URI to Cosmos DB account and its primary key, the name of the database and container we'll use. Storing secrets or sensitive data in "appsettings.json" is not recommended, but for the purpose of this assignment it will do since th GitHub repository is private and the database account will be deleted shortly after this blog-post goes live.
+This method reads the database configuration data from the appsettings.json/appsettings.Development.json file. The databasebase configuration data includes; the URI to Cosmos DB account and its primary key, the name of the database and container we'll use. Storing secrets or sensitive data in "appsettings.json" is not recommended, but for the purpose of this assignment it will do since th GitHub repository is private and the database account will be deleted shortly after this blog-post goes live.
 
 It then creates a `CosmosClient` instance (provided by the "Microsoft.Azure.Cosmos" libraray) using the account URI and the primary key. The instance is a "client-side" (Azure Web App) representation of the database account and which can execute requests against our database.
 
@@ -235,9 +235,9 @@ public class IndexModel : PageModel
 
     public async Task<RedirectToPageResult> OnPostAsync()
     {
-        // Since the `NewNote` property is bound to the model we immediately have access to the data posted with the page's form.
+        // Since the page's form automatically gets bound to `NewNote` when the [BindProperty] attribute is used we immediately have access to the data posted from the form.
 
-        // Validation for the future.
+        // No validations was setup, but this was left for future work
         if (ModelState.IsValid)
         {
             // Create a unique id for the new `Note`.
@@ -259,17 +259,78 @@ In the `IndexModel` we inject the `CosmosDbService` singleton dependency which i
 
 ## Getting it up and running in Azure App Service
 
-- screenshots
-- scripts
-- pipelines
+<!-- First of all here are the Cosmos DB settings I used  -->
+
+### For the "Silver" part of this assignment
+1. To get my Web App up and running in Azure App Service I first created an Azure Container Registry with these settings:
+    ![](/Molnapplikationer-Blogg/data/images/exercise-6-web-apps/azure-portal-container-registry-settings.png)
+
+1. With my ACR (Azure Container Registry) up and running, and my app ready to go live I turned to the command prompt in Windows to push my image to the registry:
+    1. I began my signing into Azure with the Azure CLI:
+        ```bash
+        az login
+        ```
+        This opened an Azure sign-in page in my default browser.
+    1. After signing into Azure I could login to my Azure Container Registry "jochStudentCR":
+        ```bash
+        az acr login --name jochStudentCR
+        ```
+    1. I then built my image and tagged it:
+        ```bash
+        docker build . -t azurewebapp
+        docker tag azurewebapp jochstudentcr.azurecr.io/azurewebapp:v1
+        ```
+    1. I could then my image to my ACR:
+        ```bash
+        docker push jochstudentcr.azurecr.io/azurewebapp:v1
+        ```
+    1. The final step I took was to enable "admin user" on my ACR to enable me to deploy my image from my ACR to Azure App Services:
+        ```bash
+        az acr update -n jochStudentCR --admin-enabled true
+        ```
+
+1. I could then create an Azure Web App in the Azure Portal with these settings (on the "Basics" tab):
+    ![](/Molnapplikationer-Blogg/data/images/exercise-6-web-apps/azure-portal-create-resources-create-web-app-details.png)
+
+    And these settings (on the "Docker" tab, to set up the Web App to pull an image from the my ACR):
+    ![](/Molnapplikationer-Blogg/data/images/exercise-6-web-apps/azure-portal-create-resources-create-web-app-details-docker-silver-acr.png)
+
 
 
 ## What would all of this cost?
 
+This are my cost estimate for...
+
+### a small user base:
+> With 
+![](/Molnapplikationer-Blogg/data/images/exercise-6-web-apps/azure-cost-estimates-few-users.png)
+
+### a very large user base:
+> App Service is on the `Premium v3` tier with three instances of `P3V3: 8 cores, 32 GB RAM 250 GB Storage` and utilizing the 55% discount (3 year reserved instances).
+> Azure Cosmos DB (Serverless) is setup for `100,000,000 RUs (Request Units)` and with `100 GB` of transactional storage.
+![](/Molnapplikationer-Blogg/data/images/exercise-6-web-apps/azure-cost-estimates-many-users.png)
+
+### Further details on choices:
+- `Azure Cosmos DB` uses the serverless model in both user base cases. This is used accordingly with spec of the assignment, but in a real world scenario another model such as `Autoscaled Provisioned Throughout` should probably be used for the large use base case.
+- `North Europe` is the selected location wherever it is possible to set.
+- `Linux` is the `App Service` OS in both cases.
+- Both estimates have`Azure Container Regisry -> Bandwidth -> Outbound Data Transfer` set to 5 GB.
+- `Azure Container Regisry -> Bandwidth -> Extra Storage` is set to 1 GB and 5 GB for the small and large user bases respectively.
+
+### Summary
+```
+                 | Upfront Cost | Month Cost
+Small user base: |        $0.00 |     $18.67
+Large user base: |        $0.00 |    $765.24
+```
 
 
 ## Sources & Links
-- [ Microsoft.Azure.Cosmos - nuget.com][nuget-package-microsoft-azure-cosmos]
+- [Microsoft.Azure.Cosmos - nuget.com][nuget-package-microsoft-azure-cosmos]
+- [Pushing Docker images to ACR - Azure Container Registry - blog.hildenco.com][link-blog.hildenco-pushing-docker-images-to-azure]
+- [Azure Web App for Containers - youtube.com (Microsoft Student Accelerator)][link-youtube-microsoft-student-accelerator-Azure-Web-App-for-Containers]
 
 
 [nuget-package-microsoft-azure-cosmos]: https://www.nuget.org/packages/Microsoft.Azure.Cosmos
+[link-blog.hildenco-pushing-docker-images-to-azure]: https://blog.hildenco.com/2020/10/pushing-docker-images-to-azure.html
+[link-youtube-microsoft-student-accelerator-Azure-Web-App-for-Containers]: https://www.youtube.com/watch?v=xnUOu-yPEzo
