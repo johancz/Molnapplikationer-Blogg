@@ -423,6 +423,7 @@ Large user base: |        $0.00 |    $765.24
 - [Using GitHub Container Registry - shammelburg.medium.com][link-medium-com-using-github-container-registry]
 - [Working with the Container registry - docs.github.com][link-docs-github-working-with-a-github-packages-registry]
 - [WebHook Setup Examples - docs.copado.com][link-docs-copado-webhook-setup-example]
+- [Monitor GitHub events by using a webhook with Azure Functions - docs.microsoft.com][link-docs.microsoft-learn-monitor-github-events-with-a-function-triggered-by-a-webhook]
 
 
 [nuget-package-microsoft-azure-cosmos]: https://www.nuget.org/packages/Microsoft.Azure.Cosmos
@@ -434,3 +435,4 @@ Large user base: |        $0.00 |    $765.24
 [link-medium-com-using-github-container-registry]: https://shammelburg.medium.com/using-github-container-registry-beta-2e9bf46b25c0
 [link-docs-github-working-with-a-github-packages-registry]: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry
 [link-docs-copado-webhook-setup-example]: https://docs.copado.com/article/dyuhhg8djr-webhook-setup-example
+[link-docs.microsoft-learn-monitor-github-events-with-a-function-triggered-by-a-webhook]: https://docs.microsoft.com/en-us/learn/modules/monitor-github-events-with-a-function-triggered-by-a-webhook/
