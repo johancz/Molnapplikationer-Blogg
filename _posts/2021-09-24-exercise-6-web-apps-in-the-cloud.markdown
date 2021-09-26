@@ -298,6 +298,9 @@ In the `IndexModel` we inject the `CosmosDbService` singleton dependency which i
     And these settings (on the "Docker" tab, to set up the Web App to pull an image from my ACR):
     ![](/Molnapplikationer-Blogg/data/images/exercise-6-web-apps/azure-portal-create-resources-create-web-app-details-docker-silver-acr.png)
 
+* Azure should now pull the specified image from my Azure Container Registry, please note however that continuous deployment is not setup yet and that you would need to return to this page and update the **Tag** field if you want to deploy a newer version.
+
+    I will setup continuous deployment in the next part where I walk through how I setup App Services to pull an image from my GitHub Container Registry.
 
 ### For the "Gold" part of this assignment
 
