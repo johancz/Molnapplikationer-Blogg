@@ -382,7 +382,7 @@ In the `IndexModel` we inject the `CosmosDbService` singleton dependency which i
 
 ## What would all of this cost?
 
-This are my cost estimate for...
+These are my cost estimates for...
 
 ### a small user base:
 > Container Registry is on the `Basic` tier.
