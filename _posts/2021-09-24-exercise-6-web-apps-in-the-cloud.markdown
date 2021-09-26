@@ -103,7 +103,12 @@ private static async Task<CosmosDbService> InitializeCosmosClientInstanceAsync(I
     return cosmosDbService;
 }
 ```
-This method reads the database configuration data from the appsettings.json/appsettings.Development.json file. The databasebase configuration data includes; the URI to Cosmos DB account and its primary key, the name of the database and container we'll use. Storing secrets or sensitive data in "appsettings.json" is not recommended, but for the purpose of this assignment it will do since th GitHub repository is private and the database account will be deleted shortly after this blog-post goes live.
+This method reads the database configuration data from the appsettings.json/appsettings.Development.json file. The databasebase configuration data includes; the URI to Cosmos DB account and its primary key, the name of the database and container we'll use.
+
+> ~~Storing secrets or sensitive data in "appsettings.json" is not recommended, but for the purpose of this assignment it will do since th GitHub repository is private and the database account will be deleted shortly after this blog-post goes live.~~
+> <br>
+> **Note:** I have since removed the CosmosDB data from appsettings.json and I am instead storing tihs data in my app's Application Settings in Azure (see image below):
+    ![](/Molnapplikationer-Blogg/data/images/exercise-6-web-apps/azure-portal-web-app-configuration-cosmosdb-settings.png)
 
 It then creates a `CosmosClient` instance (provided by the "Microsoft.Azure.Cosmos" libraray) using the account URI and the primary key. The instance is a "client-side" (Azure Web App) representation of the database account and which can execute requests against our database.
 
@@ -294,6 +299,83 @@ In the `IndexModel` we inject the `CosmosDbService` singleton dependency which i
     ![](/Molnapplikationer-Blogg/data/images/exercise-6-web-apps/azure-portal-create-resources-create-web-app-details-docker-silver-acr.png)
 
 
+### For the "Gold" part of this assignment
+
+* First step was to setup a workflow for building and pushing a Docker image to GHCR (GitHub Container Registry). And to do this I used a modified version of the workflow file I used for the 3rd assignment.
+
+    My workflow file:
+    ```yml
+    name: Build Docker image and push to GHCR
+
+    # Trigger the workflow whenever something is pushed to the 'release' branch
+    on:
+    push:
+        branches: [ release ]
+
+    jobs:
+    # The jobs which builds and pushes our images to two repositories, Github's container repository (GHCR) and Docker Hub.
+    build-and-push-docker-image:
+        runs-on: ubuntu-latest
+        env:
+        # Set the default working directory for all "run" steps on this workflow.
+        working-directory: .
+        
+        steps:
+        # This task checks-out the repository so that the workflow can access it. 
+        - name: Checkout code
+        uses: actions/checkout@v2.3.4
+        
+        # Login to GitHub Container Registry (GHCR) (with the login action by Docker).
+        - name: Login to GitHub Container Registry
+        uses: docker/login-action@v1.10.0
+        with:
+            # Specify the registry we want to push to.
+            registry: ghcr.io
+            # Set authentication information:
+            # Set username, the username in this case is my Github username (specified with "github.actor").
+            username: ${{ github.actor }}
+            # And the password is set with "secrets.GITHUB_TOKEN" (which is a token automatically provided by Github which can be used on this (and only this repository).
+            password: ${{ secrets.GITHUB_TOKEN }}
+            
+        # The build and push task makes use of Docker's build-push action. This task builds an image and pushes it to GHCR.
+        - name: Build and push
+        id: docker_build
+        # Here I specify to use Docker's build-push action, 
+        uses: docker/build-push-action@v2.7.0
+        with:
+            push: true
+            # Set the build context.
+            context: ${{env.working-directory}}
+            # Specify the registries we want to push our image to and set a "version tag" (e.g. "latest" or "9").
+            tags: |
+            ghcr.io/johancz/azurewebapp:latest
+            ghcr.io/johancz/azurewebapp:${{ github.run_number }}
+    ```
+
+    Now, whenever I push to the **Release** branch on my GitHub Repository it will build a Docker image and push it to GHCR.
+
+* Next we need to create a PAT (Personal Access Token) on GitHub.
+    1. Go to your GitHub account settings, and click on **Developer settings**. Next click on **Personal access tokens** and **Generate new token**. Under **Select scopes** check **read:packages** and nothing else. Click **Generate token** and store the generated token somewhere safe.
+
+
+* Next I need to make some changes to my Azure Web App. It is currently setup to pull an image from my Azure Container Registry, so let's change that.
+
+    I navigated to my Web App in the **Azure Portal** and clicked on **Deployment Center**. Here I made the following changes (see image):
+    ![](/Molnapplikationer-Blogg/data/images/exercise-6-web-apps/azure-portal-web-app-deployment-center-pull-image-from-ghcr-setup.png)
+    > **Login** is my GitHub username, and the **Password** is the GitHub PAT I generated in the previous step. Set **Continuous Deployment** to **On** and set the tag in the **Full Image Name and Tag** field to `latest`.
+* Copy the **Webhook URL** and store it somewhere safe (we'll need it in the final step).
+
+* Click **Save**, restart the Webb App to be safe and wait, it might take a little while for the "new version" to go live.
+
+* Finally, add a webhook in the GitHub repository hosting your package. I used these settings:
+
+    Enter the **Webhook URL** you copied into the **Payload URL** field and select **Let me select individual events**. Make sure only **Packages** and **Registry packages** are checked here. Leave **Content Type** at the default `application/json` and **Secret** empty. Finally click **Add webhook**.
+    <details><summary style="text-decoration:underline;">Click to see a screenshot of the webhook setup</summary>
+        <img src="/Molnapplikationer-Blogg/data/images/exercise-6-web-apps/github-repo-webhook-setup.png">
+    </details>
+
+* With the Github Action and webhook, you have now setup CI/CD. Azure should automatically pull the image with the `latest` tag whenever a new GitHub Package is created.
+
 
 ## What would all of this cost?
 
@@ -333,6 +415,11 @@ Large user base: |        $0.00 |    $765.24
 - [Azure Web App for Containers - youtube.com (Microsoft Student Accelerator)][link-youtube-microsoft-student-accelerator-Azure-Web-App-for-Containers]
 - [Using Forms in Razor Pages (Leveraging Model Binding) - learnrazorpages.com][link-razor-pages-forms-and-model-binding]
 - [Tutorial: Develop an ASP.NET Core MVC web application with Azure Cosmos DB by using .NET SDK - docs.microsoft.com][link-docs-microsoft-azure-cosmosdb-dotnet-web-app-mvc]
+- [Deploy a custom container to App Service using GitHub Actions - docs.microsoft.com][link-docs-microsoft-azure-app-service-deploy-container-github-action]
+<!-- #generate-deployment-credentials -->
+- [Using GitHub Container Registry - shammelburg.medium.com][link-medium-com-using-github-container-registry]
+- [Working with the Container registry - docs.github.com][link-docs-github-working-with-a-github-packages-registry]
+- [WebHook Setup Examples - docs.copado.com][link-docs-copado-webhook-setup-example]
 
 
 [nuget-package-microsoft-azure-cosmos]: https://www.nuget.org/packages/Microsoft.Azure.Cosmos
@@ -340,3 +427,7 @@ Large user base: |        $0.00 |    $765.24
 [link-youtube-microsoft-student-accelerator-Azure-Web-App-for-Containers]: https://www.youtube.com/watch?v=xnUOu-yPEzo
 [link-razor-pages-forms-and-model-binding]: https://www.learnrazorpages.com/razor-pages/forms
 [link-docs-microsoft-azure-cosmosdb-dotnet-web-app-mvc]: https://docs.microsoft.com/en-us/azure/cosmos-db/sql/sql-api-dotnet-application
+[link-docs-microsoft-azure-app-service-deploy-container-github-action]: https://docs.microsoft.com/en-us/azure/app-service/deploy-container-github-action?tabs=publish-profile
+[link-medium-com-using-github-container-registry]: https://shammelburg.medium.com/using-github-container-registry-beta-2e9bf46b25c0
+[link-docs-github-working-with-a-github-packages-registry]: https://docs.github.com/en/packages/working-with-a-github-packages-registry/working-with-the-container-registry#authenticating-to-the-container-registry
+[link-docs-copado-webhook-setup-example]: https://docs.copado.com/article/dyuhhg8djr-webhook-setup-example
