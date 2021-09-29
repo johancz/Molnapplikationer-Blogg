@@ -1,11 +1,11 @@
 ---
 publish: false # This file is a template, remove this line to publish a new post created from it
 layout: post
-title:  "Exercise 6 - Web Apps in the cloud"
-date:   2021-09-24 22:39
-tags: Azure, Cosmos DB, Azure Functions, Serverless
+title:  "Exercise 7 - Cloud Networks"
+date:   2021-09-29 22:59
+tags: Azure, Azure 
 ---
-
+desktopdesk
 <h1 style="color:red;">WIP, not complete!</h1>
 
 
