@@ -3,11 +3,8 @@ publish: false # This file is a template, remove this line to publish a new post
 layout: post
 title:  "Exercise 7 - Cloud Networks"
 date:   2021-09-29 22:59
-tags: Azure, Azure 
+tags: Azure, Azure Virtual Network, Virtual Private Network, Azure PaaS, VPN, VPC, VNet, Azure Private Link, ExpressRoute, Cloud Networking
 ---
-
-<h1 style="color:red;">WIP, not complete!</h1>
-
 
 ## Preface
 
@@ -27,21 +24,6 @@ The CTO has the following qualities:
 - Visual: loves diagrams and drawings.
 - Technically inclined: will understand technical terms.
 
-<!-- ~~
-Ni jobbar i ett företag som har en intern applikation som ni gärna vill modernisera, denna interna applikation använder tillgång till interna server och resurser, och jobbar med klassificerade data som inte får öppet skickas via nätat, och därför är det i följa din CTO inte möjligt att använda en PaaS moln-lösning.
-
-Ett viktigt punkt i modernisering är att implementera en enterprise bus, och ni vill gärna använda er av Azure Service Bus, men tyvär säger eran CTO säger “nej”, på grund av data inte får skickas öppet.
-
-Skriv (i eran blogg) ett argument till eran CTO som förklara och övertyga hen om att ni med hjälp av ett Azure Private Link kan använda Azure Service Bus i eran interna applikation. Förklara begrepp som Virtual Private Cloud i eran förklaring.
-
-Om ni lyckas att övertyga eran CTO till att tillåta att ni använder Azure Service Bus, kommer ni i framtiden att kunna använda andra Azure PaaS tjänster (vilket gör livet som utvecklare mycket bättre) :-)
-
-Fakta om eran CTO, hen är:
-
-    inte så svår att övertyga, om bara ni använder fakta
-    visuell och älskar därför diagram och ritningar (men se till att göra egna, använd t.ex. draw.io)
-    fan av teknisk, så var inte rädd om att använda tekniska termer
-~~ -->
 
 Hints:
 [Connect an on-premises network to a Microsoft Azure virtual network](https://docs.microsoft.com/en-us/microsoft-365/enterprise/connect-an-on-premises-network-to-a-microsoft-azure-virtual-network?view=o365-worldwide)
@@ -56,21 +38,7 @@ By taking this first step we can further down the line migrate more of our opera
 I would like to take a few minute of your time and explain some of the concepts and technologies we would like to use in an effort to reassure you that what we are suggesting will in fact keep our data secure.
 
 
-<!-- ### What is an enterprise bus
-~~
-Is a service/infrastructure of message brokers. Apps connected to the bus send messages to other apps on the bus or receive messages from external sources or other apps on the bus. Apps are inherently loosely coupled. The bus divides data between the apps on the bus, and __can functions as a load balancer__
-
-An enterprise bus can be a publisher subscriber model or a message queue, where data is "published" and an event is raised announcing to the bus that the data is available and what type of data it is. Any apps or services interested in the a specific type of data can subscribe to specific events and use 
-
-If the bus is a message queue is then incoming messages are added to the bus in the order they come in, and the first interested app or service consumes the message from the bus.
-
-A communication channel to which we can connect apps and services. Incoming data is added to the channel and whenever an app or service connected to the bus can take care of the data it consumes the data from the bus.
-~~ -->
-
-
 ### What is Azure Service Bus
-
-![](/Molnapplikationer-Blogg/data/images/exercise-7-cloud-networks/diagram-azure-service-bus.png)
 
 **Azure Service Bus** is a message broker which takes care of things such as load balancing and safe routing and transferring of data between apps and services. You can think of it as a channel for messages where we can make sure the message stays until at least one app or service has processed the data. This means our apps and service connected to the service bus can be decoupled, i.e. they can be independent of other apps and services and completely autonomous. Decoupled apps means improved app reliability and scalability, meaning we can easily spread out the load to multiple instances if traffic to a specific app or service spikes.
 
@@ -81,6 +49,8 @@ With **Azure Service Bus** we can also enable transactions, a way of grouping to
 Messages in the bus can either be sent and received from a **message queue** or it can use **topics and subscriptions** as described above. With a **queue** messages are stored in the system until they are consumed by the app/service they are intended for. **Queues** are better suited for when there is a single intended receiver for a message.
 
 **Azure Service Bus** is a very robust and mature technology. There are simple migrating paths we could use to migrate our app to Azure Service Bus.
+
+![](/Molnapplikationer-Blogg/data/images/exercise-7-cloud-networks/diagram-azure-service-bus.png)
 
 
 ### What is a Virtual Private Cloud?
@@ -120,24 +90,13 @@ To create the connection we create secure private endpoints (**Azure Private End
 
 If we place our service behind an **Azure Load Balancer**, our customer can also utilize **Private Link** to directly access our services from their own **Virtual Network**.
 
-We can extend our global reach.
-
 ![](/Molnapplikationer-Blogg/data/images/exercise-7-cloud-networks/diagram-vpc-private-link.png)
-
-<!-- ~~
-With **Azure Private Link** we can create a secure private endpoint (**Azure Private Endpoint**) within our **VPN** through which we will have private and secure communication with our customer's services, Azure **PaaS (Platform as a Service)** services and even 3rd party services. All traffic travels on Microsoft's backbone network. This means we do not send any data over, or expose our services to, the public internet.
-
-Within any configuration we can 
-
-We can create our own **Azure Private Service** within our virtual network to provide means for our customers to open private connections to our services. This requires the service to be behind a load balancer.
-~~ -->
-
 
 
 ### Closing words
 
 I do understand your reservations about moving us to the cloud and no solution is ever going to be 100% secure, but these are well established technologies, with very large user bases who need to rely on them being secure and reliable daily.
-Moving our solution to the cloud with the help of Azure's **PaaS (Platform as a Service)** will the vast resources of Azure cloud computing available to us. In the long term this would mean easier and faster expansion of our business. Short term it would make life easier for our developers, with less to resources being spent on operations and more on research & development. We would be able to iterate faster, and reduce lead time to market. We would be able to offer more options for our customers.
+Moving our solution to the cloud with the help of Azure's **PaaS (Platform as a Service)** will the vast resources of Azure cloud computing available to us. In the long term this would mean easier and faster expansion of our business. Short term it would make life easier for our developers, with less to resources being spent on operations and more on research & development. We would be able to iterate faster, and reduce lead time to market. We would be able to offer more options for our customers, and we can extend our global reach.
 
 
 
