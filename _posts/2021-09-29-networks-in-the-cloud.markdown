@@ -1,5 +1,4 @@
 ---
-publish: false # This file is a template, remove this line to publish a new post created from it
 layout: post
 title:  "Exercise 7 - Cloud Networks"
 date:   2021-09-29 22:59
