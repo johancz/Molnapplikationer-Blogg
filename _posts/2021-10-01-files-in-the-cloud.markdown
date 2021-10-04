@@ -376,43 +376,123 @@ The model for the index page (Razor Page).
 ```
 
 
-## Cost of running an app which uses Azore Storage
+## Cost of running a web app (App Service) which uses Azure Storage
 
-With 1,000 users who each upload 100 MB every day, this equals 0.1 TB of data uploaded each month.
+### Web App (App Service)
 
-And let's say that the average file size is 2 MB, this means every user uploads `50` images every days, and all users combined upload `50,000` images.
-
-If each upload equals **1 write operation** this means 100,000 write operations per month.
-
-This is my estimate for the first month:
-
-![](/Molnapplikationer-Blogg/data/images/exercise-8-files-in-the-cloud/azure-pricing-calculator-estimate-first-month.png)
+![](/Molnapplikationer-Blogg/data/images/exercise-8-files-in-the-cloud/azure-pricing-calculator-estimate-monthly-app-service.png)
 
 
-The estimates for the first six months:
+### Azure Storage
+
+#### How did I get the numbers when I estimated the costs for Azure Storage
+
+With `1,000` users who each upload `100 MB` every day, this equals `0.1 TB` of data uploaded each month.
+
+If we assume that each user has `1` **container** we'll have a total of `1,000` **containers**.
+
+And let's say that the average file size is `2 MB`, this means every user uploads `50` images every days, and all users together upload `50,000` images.
+
+If each upload equals `1` **write operation** this means roughly `1,500,000` **write operations** per month.
+
+To upload blobs to a container you need to check so that the container exists, which means (at least) `1` operation, which I'll count under **"All other operations"** (in **Azure's Pricing Calculator**).
+
+If a user uploads one image per session this means `50` operations per user per day, and `1500` operations per user per month. With `1,000` users that means `1,5000,000` operations.
+
+And for **List and create operations** we'll take the same number and multiply it by `3` (since every image is downloaded 3 times every day), this means `4,500,000` **List and create operations**.
+
+The same number is used for **Read operations**.
+
+The only properties that change each month are **Capacity**, **List and Create Container Operations** and **Read operations**.
+
+
+#### These are my estimates:
+
+##### For the first month (**Azure App Service** & **Azure Storage**):
+
+![](/Molnapplikationer-Blogg/data/images/exercise-8-files-in-the-cloud/azure-pricing-calculator-azure-storage-estimate-first-month.png)
+
+
+##### For the first six months (only **Azure Storage**):
 
 ![](/Molnapplikationer-Blogg/data/images/exercise-8-files-in-the-cloud/azure-pricing-calculator-estimate-storage-only-first-6-months.png)
 
 
 ## How does Microsoft ensure that your Blob data is secure?
 
+- To access Blob data you need to use an access key (if the Blob storage isn't set to anonymous access).
+- Data is also encrypted, both **"at rest"** (meaning while stored on Azure's servers) and **"in flight"** with https (http with TLS) (data being sent to and from Azure's services and data centers).
+
 
 
 ## How did I get the app up and running in Azure (Gold part of assignment)?
 
-To get the average file size of an image I took an average of all images (.png. jpg and .gif) in the **Picures** directory on my PC with the following powershell script:
-```powershell
-$items = Get-ChildItem -path "C:\Users\username\Pictures" -recurse -include *png,*jpg,*gif
-$count = ($items | measure-object | select -expand Count)
-$size =(($items | measure-object -property length -sum).sum /1MB)
-$avrg = $size / $count
-$avrg
-1.30598176799048
+To get it up and running I followed the same process as in assignment 4, [which I covered in an earlier blog post][myblog-assignment-4-github-actions-deploy]. 
+There are two only differences however:
+1. I'm using an Azure Web App (App Service) instead of an Azure Function.
+1. There are a few differences in my workflow file.
+
+The workflow file for this project looks like this:
+
+```yaml
+name: Build Docker image, push to GHCR and publish to azure app app
+
+# Trigger the workflow whenever something is pushed to the 'release' branch
+on:
+  push:
+    branches: [ release ]
+
+jobs:
+  # The jobs which builds and pushes our images to two repositories, Github's container repository (GHCR) and Docker Hub.
+  build-and-push-docker-image-and-publish-to-azure-web-app:
+    runs-on: ubuntu-latest
+    env:
+      # Set the default working directory for all "run" steps on this workflow.
+      working-directory: ./exercise-silver/
+
+    steps:
+    - uses: actions/checkout@v2
+
+    # Login to GitHub Container Registry (GHCR) (with the login action by Docker).
+    - name: Login to GitHub Container Registry
+      uses: docker/login-action@v1.10.0
+      with:
+        # Specify the registry we want to push to.
+        registry: ghcr.io
+        # Set authentication information:
+        # Set username, the username in this case is my Github username (specified with "github.actor").
+        username: ${{ github.actor }}
+        # And the password is set with "secrets.GITHUB_TOKEN" (which is a token automatically provided by Github which can be used on this (and only this repository).
+        password: ${{ secrets.GITHUB_TOKEN }}  
+
+    # The build and push task makes use of Docker's build-push action. This task builds an image and pushes it to GHCR.
+    - name: Build and push
+      id: docker_build
+      # Here I specify to use Docker's build-push action, 
+      uses: docker/build-push-action@v2.7.0
+      with:
+        push: true
+        # Set the build context.
+        context: ${{env.working-directory}}
+        # Specify the registries we want to push our image to and set a "version tag" (e.g. "latest" or "9").
+        # The format is: "registry/namespace/repository:version" (in my case the namespace on both registries is my username "johancz")
+        tags: |
+          ghcr.io/johancz/molnapplikationer-assignment-8:latest
+          ghcr.io/johancz/molnapplikationer-assignment-8:${{ github.run_number }}
+          
+    - uses: azure/webapps-deploy@v2
+      with:
+        app-name: 'joch-assignmnent-8-images-app'
+        publish-profile: ${{ secrets.AZURE_WEBAPP_PUBLISH_PROFILE }}
+        images: 'ghcr.io/johancz/molnapplikationer-assignment-8:latest'
 ```
+
 
 
 ## Sources & Links
 - [Average file size statistics - user:pilau - superuser.com][superuser-powershell-script-average-image-size]
-
+- [Assignment 4 Serverless, FaaS and Azure Functions - This blog][myblog-assignment-4-github-actions-deploy]
+- [How Does Azure Encrypt Data?](https://cloudacademy.com/blog/how-does-azure-encrypt-data/)
 
 [superuser-powershell-script-average-image-size]: https://superuser.com/a/643542
+[myblog-assignment-4-github-actions-deploy]: https://johancz.github.io/Molnapplikationer-Blogg/2021/09/17/exercise-4-serverless-faas-and-azure-functions#deploy-to-azure-functions-with-a-github-actions-pipeline
