@@ -388,7 +388,7 @@ The model for the index page (Razor Page).
 
 ### Azure Storage
 
-#### How did I get the numbers when I estimated the costs for Azure Storage
+#### How did I get the numbers when I estimated the costs for Azure Storage?
 
 With `1,000` users who each upload `100 MB` every day, this equals `0.1 TB` of data uploaded each month.
 
@@ -431,7 +431,7 @@ The only properties that change each month are **Capacity**, **List and Create C
 ## How did I get the app up and running in Azure (Gold part of assignment)?
 
 To get it up and running I followed the same process as in assignment 4, [which I covered in an earlier blog post][myblog-assignment-4-github-actions-deploy]. 
-There are two only differences however:
+There are two differences however:
 1. I'm using an Azure Web App (App Service) instead of an Azure Function.
 1. There are a few differences in my workflow file.
 
