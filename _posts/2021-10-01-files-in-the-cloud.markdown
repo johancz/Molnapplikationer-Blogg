@@ -5,26 +5,29 @@ date: 2021-10-01 23:53
 tags: Azure, Azure Storage, Azure Blob Storage, Razor Pages, Github Actions
 ---
 
-<h1 style="color:red;">WIP, not complete!</h1>
-
 
 ## Preface
 
-Gör en .NET-konsol applikation med C# som kan ladda upp ett bild till en Azure blob storage. När man har laddat upp bilden ska applikationen visa URLen till bilden i bloben.
+### The assignment this week was to:
 
-**Brons (enkel):** Konsol applikation
+Create a .NET console app with C# that can upload an image to a Azure blob storage account. Once the image has been uploaded, the app should display the URL to the image in the blob storage.
 
-Testa lokalt med en storage emulator (välj själv emellam The Microsoft Azure Storage Emulator och Azurite), innan ni ansluttar mot Azure.
+The three levels to the assignment (only **bronze** or **silver** is mandatory):
 
+**Bronze (easy):** 
 
-**Silver (meddel):** Skåpa en web app som läser läser vilka bilder som finns i eran blob, läsa deras URL och använn denna till att vises bilderna i en HTML sida.
-
-Lokalt kan webb applikationen jobba mot eran storage emulator eller mot en container i Azure.
-
-
-**Guld (avancerat):** Bygg som i silver en web app som läser av era filer i blob storage. Lägg till automatisk deploy med GitHub actions till Azure.
+Test the console app locally with a storage emulator (choose between The Microsoft Azure Storage Emulator and Azurite), before connecting the app to Azure Storage.
 
 
+**Silver (medium):**
+
+Create a Web App fetch all images in the blob storage, and displays them in the web app.
+
+The app, when running locally, can work against the storage emulator or directly with a blob container in Azure Storage.
+
+**Gold (advanced):**
+
+Complete the silver part of the assignment, and then set up automatic deployment of the app to Azure with GitHub Actions.
 
 
 ## The app
