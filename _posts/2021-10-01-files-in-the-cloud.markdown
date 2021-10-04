@@ -496,6 +496,9 @@ jobs:
 - [Average file size statistics - user:pilau - superuser.com][superuser-powershell-script-average-image-size]
 - [Assignment 4 Serverless, FaaS and Azure Functions - This blog][myblog-assignment-4-github-actions-deploy]
 - [How Does Azure Encrypt Data?](https://cloudacademy.com/blog/how-does-azure-encrypt-data/)
+- [Quickstart: Azure Blob Storage client library v12 for .NET - docs.microsoft.com](https://docs.microsoft.com/en-us/azure/storage/blobs/storage-quickstart-blobs-dotnet)
+- [How to upload files to Microsoft Azure Blob Storage with C# - TechWithPat @ youtube.com](https://www.youtube.com/watch?v=JZWaWAU548g)
+- [Deploy to App Service using GitHub Actions - docs.microsoft.com](https://docs.microsoft.com/en-us/azure/app-service/deploy-github-actions?tabs=applevel#deploy-to-app-service)
 
 [superuser-powershell-script-average-image-size]: https://superuser.com/a/643542
 [myblog-assignment-4-github-actions-deploy]: https://johancz.github.io/Molnapplikationer-Blogg/2021/09/17/exercise-4-serverless-faas-and-azure-functions#deploy-to-azure-functions-with-a-github-actions-pipeline
