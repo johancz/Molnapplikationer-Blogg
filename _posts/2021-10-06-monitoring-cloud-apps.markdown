@@ -47,13 +47,20 @@ To get my app up and running as an Azure Web App (App Service) I followed these 
 
 ## How can logging/monitoring your app improve its security?
 
-With Azure Monitoring you can keep an eye of all of your resources. You can for example query for any VMs that are missing Window Updates, and set up alerts or present this data in your Azure Dashboard or an Azure Workbook.
+With Azure Monitoring you can keep an eye of all of your resources. You can for example query for any VMs that are missing Window Updates, which should be extremely useful since outdated software can result in major security incidents. 
+
+
+All pertinent data from logs and monitors can be presented on the organizations Azure Dashboard or in Azure Workbooks. If the data points to critical security issues, alerts can be set up to push out SMS or email messages to the security team.
 
 The security team can monitor heartbeats to identify when servers are unavailable, which might indicate a denial-of-service (dos) attack.
 
 
 ## The queries
 
+### Query 1: Get all logs with a severity level of warning or higher.
+```kusto
+traces | where severityLevel >= 2 
+```
 
 
 ## Sources & Links
