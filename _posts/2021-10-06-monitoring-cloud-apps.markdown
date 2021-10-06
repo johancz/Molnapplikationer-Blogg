@@ -43,6 +43,101 @@ To get my app up and running as an Azure Web App (App Service) I followed these 
 
 ## The code
 
+Let's start in the Program class (Program.cs):
+```csharp
+public class Program
+{
+    public static int Main(string[] args)
+    {
+        Log.Logger = new LoggerConfiguration()
+            .MinimumLevel.Override("Microsoft", LogEventLevel.Information)
+            //.MinimumLevel.Override("Microsoft.AspNetCore", LogEventLevel.Warning)
+            //.Enrich.WithMachineName()
+            //.Enrich.WithProcessId()
+            .Enrich.FromLogContext()
+            .WriteTo.Console(new CompactJsonFormatter())
+            .WriteTo.File(@"Logs\trace.log",
+                fileSizeLimitBytes: 5_000_000,
+                rollOnFileSizeLimit: true,
+                shared: true,
+                flushToDiskInterval: TimeSpan.FromSeconds(1))
+            .WriteTo.ApplicationInsights(new TelemetryConfiguration { InstrumentationKey = "04efd465-67ba-4173-b3bb-a9ed1ded8f48" }, TelemetryConverter.Traces)
+            .CreateLogger();
+
+        try
+        {
+            Log.Information("Starting web host");
+            CreateHostBuilder(args).Build().Run();
+            return 0;
+        }
+        catch (Exception e)
+        {
+            Log.Fatal(e, "Host terminated unexpectedly");
+            return 1;
+        }
+        finally
+        {
+            Log.CloseAndFlush();
+        }
+    }
+
+    public static IHostBuilder CreateHostBuilder(string[] args) =>
+        Host.CreateDefaultBuilder(args)
+            .UseSerilog() // <------------------------------------------ Added
+            .ConfigureWebHostDefaults(webBuilder =>
+            {
+                webBuilder.UseStartup<Startup>();
+            });
+}
+```
+
+### Startup.cs
+```csharp
+public void ConfigureServices(IServiceCollection services)
+{
+    Log.Logger.Information("Configuring Services");
+    services.AddSingleton(Log.Logger);
+    services.AddApplicationInsightsTelemetry("04efd465-67ba-4173-b3bb-a9ed1ded8f48");
+    services.AddSingleton<ICosmosDbService>(InitializeCosmosClientInstanceAsync(Configuration.GetSection("CosmosDb"), Log.Logger).GetAwaiter().GetResult());
+    services.AddRazorPages();
+}
+```
+
+In the **Configure** method:
+
+```csharp
+// Enable Serilog's smarter HTTP request logging middleware.
+app.UseSerilogRequestLogging();
+```
+
+
+
+### Index.cshtml.cs:
+
+```csharp
+public IndexModel(ILogger logger, ICosmosDbService cosmosDbService)
+//public IndexModel(ILogger logger)
+{
+    _logger = logger.ForContext<IndexModel>();
+    _cosmosDbService = cosmosDbService;
+    //_cosmosDbService = null;
+}
+```
+
+### appsettings.json
+```json
+"Serilog": {
+    "MinimumLevel": {
+        "Default": "Information",
+        "Override": {
+            "System": "Warning",
+            "Microsoft": "Warning",
+            "Microsoft.EntityFrameworkCore": "Warning"
+        }
+    }
+}
+```
+
 
 
 ## How can logging/monitoring your app improve its security?
