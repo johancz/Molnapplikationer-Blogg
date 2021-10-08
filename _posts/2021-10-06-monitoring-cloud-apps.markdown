@@ -157,8 +157,6 @@ In the **Configure** method:
 app.UseSerilogRequestLogging(); // <--------- Added
 ```
 
-
-
 ### Index.cshtml.cs:
 
 ```csharp
@@ -326,6 +324,7 @@ requests
 - [Serilog.AspNetCore - github.com][link-github-serilog-aspnetcore]
 - [Serilog.Sinks.ApplicationInsights - github.com][link-github-serilog-sink-application-insights]: https://github.com/serilog/serilog-sinks-applicationinsights
 - [Serilog.Settings.Configuration - github.com][link-github-serilog-sink-configuration]: https://github.com/serilog/serilog-settings-configuration
+- [AppInsights and logging with Serilog - arvehansen.net][source-arvehansen-appinsights-and-logging-with-serilog]
 
 [blog-post-6]: https://johancz.github.io/Molnapplikationer-Blogg/2021/09/24/exercise-6-web-apps-in-the-cloud.html
 [docs.microsoft.com-learn-analyze-infrastructure-with-azure-monitor-logs]: https://docs.microsoft.com/en-us/learn/modules/analyze-infrastructure-with-azure-monitor-logs/
@@ -335,3 +334,4 @@ requests
 [link-github-serilog-aspnetcore]: https://github.com/serilog/serilog-aspnetcore
 [link-github-serilog-sink-application-insights]: https://github.com/serilog/serilog-sinks-applicationinsights
 [link-github-serilog-sink-configuration]: https://github.com/serilog/serilog-settings-configuration
+[source-arvehansen-appinsights-and-logging-with-serilog]: https://arvehansen.net/codecave/2020/03/01/appinsights-and-logging-with-serilog/
