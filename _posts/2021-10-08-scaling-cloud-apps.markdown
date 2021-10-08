@@ -2,8 +2,8 @@
 publish: false # This file is a template, remove this line to publish a new post created from it
 layout: post
 title:  "Exercise 10 - Scaling Web Apps (up and out)"
-date:   2021-09-24 22:39
-tags: Azure, Scaling, Autoscale, 
+date:   2021-10-08 19:59
+tags: Azure, Scaling, Autoscale
 ---
 
 <h1 style="color:red;">WIP, not complete!</h1>
@@ -43,7 +43,7 @@ Horizontal scaling is perhaps better left to when you have hit the roof of what 
 
 I wasn't expecting there being no price difference between horizontal and vertical scaling on Azure, for both **App Service** and **VM**.
 
-![](/Molnapplikationer-Blogg/data/images/exercise-9-monitoring-cloud-apps/assignment-9-diagram.png)
+![](/Molnapplikationer-Blogg/data/images/exercise-10-scaling/assignment-10-azure-pricing-app-service-and-VM-scaling-vertical-and-horizontal.png)
 
 These are common variables for all data entries:
 - Region: North Europe
@@ -94,7 +94,7 @@ Not all App Service Plan **pricing tiers** support autoscaling.
 
 Funnily enough, even though the "Free" tier doesn't support more than **1 instance**, Microsoft's own **Pricing Calculator** allows you to select more than **1 instance** on the "Free" tier. Loop hole? 😁
 
-![](/Molnapplikationer-Blogg/data/images/exercise-9-monitoring-cloud-apps/azure-pricing-weird-bug-free-tier-number-of-instances.png)
+![](/Molnapplikationer-Blogg/data/images/exercise-10-scaling/azure-pricing-weird-bug-free-tier-number-of-instances.png)
 
 
 ## Sources & Links
