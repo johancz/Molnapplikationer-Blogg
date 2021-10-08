@@ -5,9 +5,6 @@ date:   2021-10-06 18:52
 tags: Azure, Application Insights, Serilog, Logging
 ---
 
-<h1 style="color:red;">WIP, not complete!</h1>
-
-
 ## The assignment
 
 The assignment this week was to take an older project (e.g. the one from assignment #6), implement logging to **Application Insights**, deploy the app to **Azure App Service** and create at least **five** Kusto queries.
