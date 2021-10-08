@@ -34,22 +34,27 @@ To get my app up and running as an Azure Web App (App Service) I followed these 
     1. Add the contents of the **publish profile** to a new GitHub Secret called `AZURE_WEBAPP_PUBLISH_PROFILE`.
 1. Add the **CosmosDB** configuration data (CosmosDb account uri & key, database name and container name) to the **Web Webb**'s configuration store in Azure.
     ![](/Molnapplikationer-Blogg/data/images/exercise-9-monitoring-cloud-apps/azure-porta-web-app-configuration-cosmosdb.png)
-
+1. Enable **Application Insights** for the web app and copy the instrumentation key.
+1. Update the code to use **Serilog** for logging to **Application Insights**
 
 
 ## A diagram
 
 
 
+
 ## The code
 
+The code used for this assignment is built upon the project from assignment 6. [Click here if you would like more information on it.][link-this-blog-assignment-6]
 
 
 ### Libraries (nu-get packages):
 
 We use a number of libraries, such as like **Serilog** for structured logging, sinks for serilog and a library to read configurations for  serilog from the config file (appsettings.json).
 
+
 ### Serilog Sinks
+
 Sinks are essentially logging targets, i.e. Console, File or ApplicationInsights. They route the logging data to various targets and formats.
 
 
@@ -275,7 +280,17 @@ traces | where severityLevel >= 2
 - [Exercise 6 - Web Apps in the Cloud - this blog][blog-post-6]
 - [Analyze your Azure infrastructure by using Azure Monitor logs - Microsoft Learn @ docs.microsoft.com][docs.microsoft.com-learn-analyze-infrastructure-with-azure-monitor-logs]
 - <a name="source-azure-docs-robot933456">1</a>: [robots933456 in logs -  MicrosoftDocs/azure-docs @ github][azure-docs-app-service-robot933456.txt]
+- [Serilog][link-serilog]: https://serilog.net/
+- [Serilog - github.com][link-github-serilog]: https://github.com/serilog/serilog
+- [Serilog.AspNetCore - github.com][link-github-serilog-aspnetcore]
+- [Serilog.Sinks.ApplicationInsights - github.com][link-github-serilog-sink-application-insights]: https://github.com/serilog/serilog-sinks-applicationinsights
+- [Serilog.Settings.Configuration - github.com][link-github-serilog-sink-configuration]: https://github.com/serilog/serilog-settings-configuration
 
 [blog-post-6]: https://johancz.github.io/Molnapplikationer-Blogg/2021/09/24/exercise-6-web-apps-in-the-cloud.html
 [docs.microsoft.com-learn-analyze-infrastructure-with-azure-monitor-logs]: https://docs.microsoft.com/en-us/learn/modules/analyze-infrastructure-with-azure-monitor-logs/
 [azure-docs-app-service-robot933456.txt]: https://github.com/MicrosoftDocs/azure-docs/blob/master/includes/app-service-web-configure-robots933456.md
+[link-serilog]: https://serilog.net/
+[link-github-serilog]: https://github.com/serilog/serilog
+[link-github-serilog-aspnetcore]: https://github.com/serilog/serilog-aspnetcore
+[link-github-serilog-sink-application-insights]: https://github.com/serilog/serilog-sinks-applicationinsights
+[link-github-serilog-sink-configuration]: https://github.com/serilog/serilog-settings-configuration
