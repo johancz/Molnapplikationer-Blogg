@@ -48,7 +48,7 @@ To get my app up and running as an Azure Web App (App Service) I followed these 
 
 ### Libraries (nu-get packages):
 
-We use a number of libraries, such as like **Serilog** for structured logging, sinks for serilog and a library to read configurations for  serilog from the config file (appsettings.json).
+We use a number of libraries, such as like **Serilog** for structured logging, and extensions for Serilog such as **Serilog.AspNetCore**, sinks for Serilog and a library to read configurations for Serilog from the config file (appsettings.json/appsettings.Development.json).
 
 
 ### Serilog Sinks
@@ -62,11 +62,12 @@ You can use extensions for Serilog called "Enrichers" that each provide access t
 I could've used more libraries for collecting data such as "Serilog.Enrichers.Environment" to collect more data such as the MachineName, EnvironmentUserName and EnvironmentName the error originates from.
 
 
-#### Serilog.Settings.Configuration
+### Serilog.Settings.Configuration
 
 A settings provider for Serilog which reads from `Microsoft.Extensions.Configuration` sources, e,g. "appsettings.json" and "appsettings.Development.json, for any Serilog configuration.
 
 
+### Code snippets from the app
 
 Let's start in the Program class (Program.cs):
 ```csharp
@@ -93,7 +94,7 @@ public class Program
                 flushToDiskInterval: TimeSpan.FromSeconds(1))
             // Setup writing log events to Azure Application Insight. The InstrumentationKey links our telemetry data with an Application Insights resources.
             // It is also important to note that tis key should not be hardcoded or pushed to the git repo hosting the code.
-            .WriteTo.ApplicationInsights(new TelemetryConfiguration { InstrumentationKey = "04efd465-67ba-4173-b3bb-a9ed1ded8f48" }, TelemetryConverter.Traces)
+            .WriteTo.ApplicationInsights(new TelemetryConfiguration { InstrumentationKey = "Instrumentation key goes here" }, TelemetryConverter.Traces)
             .CreateLogger();
 
         // We add a try-catch block to catch any configuraiton or startup exceptions, which we log with 
@@ -139,7 +140,7 @@ public void ConfigureServices(IServiceCollection services)
     // Register Serilog's logger as a `Singleton` for dependency injection.
     services.AddSingleton(Log.Logger);
     // Enable Application Insights telemetry collection for this app. 
-    services.AddApplicationInsightsTelemetry("04efd465-67ba-4173-b3bb-a9ed1ded8f48");
+    services.AddApplicationInsightsTelemetry("Instrumentation key goes here");
     //services.AddSingleton<TelemetryClient>
 
     // We register an instance of our service class `CosmosDbService` as a `Singleton` for dependency injection.
@@ -271,6 +272,48 @@ In this case we see two failures types:
 ### Query 1: Get all logs with a severity level of warning or higher.
 ```kusto
 traces | where severityLevel >= 2 
+```
+
+### Query 2: Get the average request response time for the past 24 hours.
+```kusto
+requests
+| where timestamp > ago(24h) 
+| summarize avgRequestDuration=avg(duration) by bin(timestamp, 10m)
+| render timechart
+```
+
+### Query 3: Get an insight into failures in dependencies used by the app
+```kusto
+dependencies
+| where success == false
+| summarize totalCount=sum(itemCount) by type
+```
+
+### Query 4: Get a count and average duration of requests for each operation (pages and resources)
+
+A summary of all requests by operation (request type and resources.
+This informs the dev team of which pages and resources are requested the most. The dev team could use this to figure out which resources can be cached (unless this isn't already taken care of by the SaaS provider).
+If the average duration is too high this might indicate a problem.
+The SuccessRate (%) indicates which operations fail the most.
+
+
+E.g. `GET /Index`, `GET /Index`
+
+```kusto
+requests
+| summarize RequestsCount=sum(itemCount), AverageDuration=avg(duration),
+    SuccessRate=countif(success == true)/count()*100 by Operation=operation_Name
+| order by RequestsCount desc
+```
+### Query 5: Top 10 countries by request count (traffic)
+
+This information could be used to better distribute the app (i.e. closer to your customers).
+
+```kusto
+requests
+| summarize CountByCountry=count() by client_CountryOrRegion
+| top 10 by CountByCountry
+| render piechart
 ```
 
 
