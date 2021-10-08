@@ -40,13 +40,11 @@ To get my app up and running as an Azure Web App (App Service) I followed these 
 
 ## A diagram
 
+![](/Molnapplikationer-Blogg/data/images/exercise-9-monitoring-cloud-apps/assignment-9-diagram.png)
 
 
 
 ## The code
-
-The code used for this assignment is built upon the project from assignment 6. [Click here if you would like more information on it.][link-this-blog-assignment-6]
-
 
 ### Libraries (nu-get packages):
 
