@@ -18,11 +18,16 @@ Hur påverker det kostnad att ha en applikation Azure som skalar horisontalt vs 
 Inte alla Azure Service App plans gir möjlighet att skala, vilka gir vilka möjligheter?
 
 
+## What is scaling?
+
+Scaling is a configuring your infrastructure to respond to demand.
+
+
 ## What is the difference between horizontal and vertical scaling?
 
-**Horizontal scaling**, also knows as in-and-out scaling, is when you scale the number of instances of your app/resource.
+**Horizontal scaling**, also knows as in-and-out scaling, is when you scale the number of instances of your app/resource. This often means spooling up the app on a new server.
 
-**Vertical scaling**, or up-and-down scaling, is when an app or resources is when the computing power and computing resources are increases or decrease for an instance.
+**Vertical scaling**, or up-and-down scaling, is when an instance's/server's computing power and computing resources are increases, or decreased, in response to current demand. This could mean increasing/decreasing RAM, core or virtual CPU count, or storage.
 
 ### What should I use?
 
@@ -81,10 +86,10 @@ The instances used for vertical scaling are:
 
 
 
-### For an **App Service**?
+<!-- ### For an **App Service**?
 
 ### For a VM (Virtual Machine)?
-
+ -->
 
 ## Which Azure App Service plans support app scaling?
 
@@ -92,13 +97,21 @@ The instances used for vertical scaling are:
 
 Not all App Service Plan **pricing tiers** support autoscaling.
 
+For **Azure App Service** the **Free**, **Shared** and **Basic** tiers (which are meant for trialing, testing and development) do not support **Azure Auto Scale**, but the **Basic** tier supports up to 3 instances. The **Standard**, **Premium** and **Isolated** tiers all support **Auto Scale** and up to 10, 30 (in certain regions) and 100 instances respectively.
+
 Funnily enough, even though the "Free" tier doesn't support more than **1 instance**, Microsoft's own **Pricing Calculator** allows you to select more than **1 instance** on the "Free" tier. Loop hole? 😁
 
 ![](/Molnapplikationer-Blogg/data/images/exercise-10-scaling/azure-pricing-weird-bug-free-tier-number-of-instances.png)
 
 
 ## Sources & Links
-- [Pagely - Scaling up vs scaling out][https://pagely.com/blog/scaling-up-vs-scaling-out/]
+- [Pagely - Scaling up vs scaling out](https://pagely.com/blog/scaling-up-vs-scaling-out/)
+- [Scaling out vs scaling up - Azure.Microsoft.com](https://azure.microsoft.com/sv-se/overview/scaling-out-vs-scaling-up/)
+- [Azure App Service pricing - Azure.Microsoft.com](https://azure.microsoft.com/en-us/pricing/details/app-service/windows/)
+- [Scale up an app in Azure App Service - Docs.Microsoft.com](https://docs.microsoft.com/en-us/azure/app-service/manage-scale-up)
+- [Scale apps in Azure App Service - Docs.Microsoft.com](https://docs.microsoft.com/en-us/learn/modules/scale-apps-app-service/)
+- [Scale up vs Scale out: What’s the difference? - opsani.com](https://opsani.com/blog/scale-up-vs-scale-out-whats-the-difference/)
+- [Azure Pricing Calculator - Azure.Microsoft.com](https://azure.microsoft.com/en-us/pricing/calculator/)
 
 
 [url-id]: url
