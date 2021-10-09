@@ -6,9 +6,6 @@ date:   2021-10-08 19:59
 tags: Azure, Scaling, Autoscale
 ---
 
-<h1 style="color:red;">WIP, not complete!</h1>
-
-
 ## The assignment (in Swedish)
 
 Förklara skildnad på att skala en applikation horisontalt och vertikalt
