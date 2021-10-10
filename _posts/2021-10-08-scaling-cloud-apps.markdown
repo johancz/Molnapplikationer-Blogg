@@ -96,6 +96,8 @@ Not all App Service Plan **pricing tiers** support autoscaling.
 
 For **Azure App Service** the **Free**, **Shared** and **Basic** tiers (which are meant for trialing, testing and development) do not support **Azure Auto Scale**, but the **Basic** tier supports up to 3 instances. The **Standard**, **Premium** and **Isolated** tiers all support **Auto Scale** and up to 10, 30 (in certain regions) and 100 instances respectively.
 
+The **Free** and **Shared** tiers inherently cannot scale out since they are only alloted a certain amount of CPU minutes and run on a shared VM instance (shared with other Azure users).
+
 Funnily enough, even though the "Free" tier doesn't support more than **1 instance**, Microsoft's own **Pricing Calculator** allows you to select more than **1 instance** on the "Free" tier. Loop hole? 😁
 
 ![](/Molnapplikationer-Blogg/data/images/exercise-10-scaling/azure-pricing-weird-bug-free-tier-number-of-instances.png)
